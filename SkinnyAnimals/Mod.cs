@@ -49,6 +49,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
             name: () => "Push Speed Multiplier", 
             getValue: () => Config.PushSpeedMultiplier,
             setValue: value => Config.PushSpeedMultiplier = value,
+            tooltip: () => "Multiplies the speed of you pushing past animals, only applies when ignore collision is off",
             min: 1,
             max: 10
         );

@@ -11,6 +11,17 @@
   "dehydrators-enabled": "Dehydrators Enabled",
   "fish-smokers-enabled": "Fish Smokers Enabled",
   
+  "bait-makers-enabled": "Bait Makers Enabled",
+  "bone-mills-enabled": "Bone Mills Enabled",
+  "charcoal-kilns-enabled": "Charcoal Kilns Enabled",
+  "crystalariums-enabled": "Crystalariums Enabled",
+  "furnaces-enabled": "Furnaces Enabled",
+  "recycling-machines-enabled": "Recycling Machines Enabled",
+  "seed-makers-enabled": "Seed Makers Enabled",
+  "slime-egg-presses-enabled": "Slime Egg-Presses Enabled",
+  "crab-pots-enabled": "Crab Pots Enabled",
+  "deconstructors-enabled": "Deconstructors Enabled",
+  
   "bubble-y-offset": "Bubble Y Offset",
   "emote-interval": "Emote Interval (ms)",
   "opacity": "Opacity",

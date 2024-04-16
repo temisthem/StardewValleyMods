@@ -1,0 +1,18 @@
+﻿{
+  "enabled": "Enabled",
+  
+  "jars-enabled": "Jars Enabled",
+  "kegs-enabled": "Kegs Enabled",
+  "casks-enabled": "Casks Enabled",
+  "mayonnaise-machines-enabled": "Mayonnaise Machines Enabled",
+  "cheese-presses-enabled": "Cheese Presses Enabled",
+  "looms-enabled": "Looms Enabled",
+  "oil-makers-enabled": "Oil Makers Enabled",
+  "dehydrators-enabled": "Dehydrators Enabled",
+  "fish-smokers-enabled": "Fish Smokers Enabled",
+  
+  "bubble-y-offset": "Bubble Y Offset",
+  "emote-interval": "Emote Interval (ms)",
+  "opacity": "Opacity",
+  "bubble-size": "Bubble Size"
+}

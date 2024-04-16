@@ -14,6 +14,7 @@ internal class Mod: StardewModdingAPI.Mod {
 
     public override void Entry(IModHelper helper) {
         Config = Helper.ReadConfig<Configuration>();
+        I18n.Init(helper.Translation);
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         helper.Events.GameLoop.SaveLoaded += SaveLoaded;
@@ -134,80 +135,80 @@ internal class Mod: StardewModdingAPI.Mod {
             reset: () => Config = new Configuration(),
             save: () => Helper.WriteConfig(Config)
         );
-        
+
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Enabled", 
+            name: I18n.Enabled,
             getValue: () => Config.Enabled,
             setValue: value => Config.Enabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Jars Enabled", 
+            name: I18n.JarsEnabled, 
             getValue: () => Config.JarsEnabled,
             setValue: value => Config.JarsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Kegs Enabled", 
+            name: I18n.KegsEnabled, 
             getValue: () => Config.KegsEnabled,
             setValue: value => Config.KegsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Casks Enabled", 
+            name: I18n.CasksEnabled, 
             getValue: () => Config.CasksEnabled,
             setValue: value => Config.CasksEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Mayonnaise Machines Enabled", 
+            name: I18n.MayonnaiseMachinesEnabled, 
             getValue: () => Config.MayonnaiseMachineEnabled,
             setValue: value => Config.MayonnaiseMachineEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Cheese Presses Enabled", 
+            name: I18n.CheesePressesEnabled, 
             getValue: () => Config.CheesePressEnabled,
             setValue: value => Config.CheesePressEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Looms Enabled", 
+            name: I18n.LoomsEnabled, 
             getValue: () => Config.LoomEnabled,
             setValue: value => Config.LoomEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Oil Makers Enabled", 
+            name: I18n.OilMakersEnabled, 
             getValue: () => Config.OilMakerEnabled,
             setValue: value => Config.OilMakerEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Dehydrators Enabled", 
+            name: I18n.DehydratorsEnabled, 
             getValue: () => Config.DehydratorEnabled,
             setValue: value => Config.DehydratorEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: () => "Fish Smokers Enabled", 
+            name: I18n.FishSmokersEnabled, 
             getValue: () => Config.FishSmokerEnabled,
             setValue: value => Config.FishSmokerEnabled = value
         );
 
         configMenu.AddNumberOption(
             mod: ModManifest,
-            name: () => "Bubble Y Offset",
+            name: I18n.BubbleYOffset,
             getValue: () => Config.OffsetY,
             setValue: value => Config.OffsetY = value,
             min: 0,
@@ -216,7 +217,7 @@ internal class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddNumberOption(
             mod: ModManifest,
-            name: () => "Emote Interval (ms)",
+            name: I18n.EmoteInterval,
             getValue: () => Config.EmoteInterval,
             setValue: value => Config.EmoteInterval = value,
             min: 0,
@@ -225,7 +226,7 @@ internal class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddNumberOption(
             mod: ModManifest,
-            name: () => "Opacity",
+            name: I18n.Opacity,
             getValue: () => Config.OpacityPercent,
             setValue: value => Config.OpacityPercent = value,
             min: 1,
@@ -234,7 +235,7 @@ internal class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddNumberOption(
             mod: ModManifest,
-            name: () => "Bubble Size",
+            name: I18n.BubbleSize,
             getValue: () => Config.SizePercent,
             setValue: value => Config.SizePercent = value,
             min: 1,

@@ -58,7 +58,9 @@ internal class Mod: StardewModdingAPI.Mod {
 
         // MinutesUntilReady <= 0 because casks that have an item removed will be < 0
         var objects = Game1.currentLocation.Objects.Values
-            .Where(o => IsObjectJar(o) || IsObjectKeg(o) || IsObjectCask(o))
+            .Where(o => IsObjectJar(o) || IsObjectKeg(o) || IsObjectCask(o) ||
+                        IsObjectMayonnaiseMachine(o) || IsObjectCheesePress(o) || IsObjectLoom(o) ||
+                        IsObjectOilMaker(o) || IsObjectDehydrator(o) || IsObjectFishSmoker(o))
             .Where(o => o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value)
             .ToList();
 
@@ -68,8 +70,7 @@ internal class Mod: StardewModdingAPI.Mod {
     private void DrawBubbles(Object o, SpriteBatch spriteBatch) {
         Vector2 tilePosition = o.TileLocation * 64;
         Vector2 emotePosition = Game1.GlobalToLocal(tilePosition);
-        float sizeOffset = (100 - Config.SizePercent) / 100f * 32;
-        emotePosition += new Vector2(sizeOffset, -Config.OffsetY);
+        emotePosition += new Vector2((100 - Config.SizePercent) / 100f * 32, -Config.OffsetY);
         
         spriteBatch.Draw(Game1.emoteSpriteSheet,
             emotePosition, 
@@ -95,6 +96,36 @@ internal class Mod: StardewModdingAPI.Mod {
     private bool IsObjectCask(Object o) {
         if (!Config.CasksEnabled) return false;
         return o.QualifiedItemId == "(BC)163";
+    }
+    
+    private bool IsObjectMayonnaiseMachine(Object o) {
+        if (!Config.MayonnaiseMachineEnabled) return false;
+        return o.QualifiedItemId == "(BC)24";
+    }
+    
+    private bool IsObjectCheesePress(Object o) {
+        if (!Config.CheesePressEnabled) return false;
+        return o.QualifiedItemId == "(BC)16";
+    }
+    
+    private bool IsObjectLoom(Object o) {
+        if (!Config.LoomEnabled) return false;
+        return o.QualifiedItemId == "(BC)17";
+    }
+    
+    private bool IsObjectOilMaker(Object o) {
+        if (!Config.OilMakerEnabled) return false;
+        return o.QualifiedItemId == "(BC)19";
+    }
+    
+    private bool IsObjectDehydrator(Object o) {
+        if (!Config.DehydratorEnabled) return false;
+        return o.QualifiedItemId == "(BC)Dehydrator";
+    }
+    
+    private bool IsObjectFishSmoker(Object o) {
+        if (!Config.FishSmokerEnabled) return false;
+        return o.QualifiedItemId == "(BC)FishSmoker";
     }
 
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
@@ -132,6 +163,48 @@ internal class Mod: StardewModdingAPI.Mod {
             setValue: value => Config.CasksEnabled = value
         );
         
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: () => "Mayonnaise Machines Enabled", 
+            getValue: () => Config.MayonnaiseMachineEnabled,
+            setValue: value => Config.MayonnaiseMachineEnabled = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: () => "Cheese Presses Enabled", 
+            getValue: () => Config.CheesePressEnabled,
+            setValue: value => Config.CheesePressEnabled = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: () => "Looms Enabled", 
+            getValue: () => Config.LoomEnabled,
+            setValue: value => Config.LoomEnabled = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: () => "Oil Makers Enabled", 
+            getValue: () => Config.OilMakerEnabled,
+            setValue: value => Config.OilMakerEnabled = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: () => "Dehydrators Enabled", 
+            getValue: () => Config.DehydratorEnabled,
+            setValue: value => Config.DehydratorEnabled = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: () => "Fish Smokers Enabled", 
+            getValue: () => Config.FishSmokerEnabled,
+            setValue: value => Config.FishSmokerEnabled = value
+        );
+
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: () => "Bubble Y Offset",

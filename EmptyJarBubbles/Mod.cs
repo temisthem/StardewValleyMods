@@ -55,7 +55,6 @@ internal class Mod: StardewModdingAPI.Mod {
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
-        Machines = new List<Object>();
         MachineData = DataLoader.Machines(Game1.content);
         ModdedMachineQualifiedIds = GetModdedMachinesFromMachineData();
     }

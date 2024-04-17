@@ -15,6 +15,7 @@ internal class Mod: StardewModdingAPI.Mod {
     internal static int CurrentEmoteInterval;
     internal static List<Object> Machines;
     internal static Dictionary<string, MachineData> MachineData;
+    internal static List<string> ModdedMachineQualifiedIds;
 
     public override void Entry(IModHelper helper) {
         Config = Helper.ReadConfig<Configuration>();
@@ -54,8 +55,21 @@ internal class Mod: StardewModdingAPI.Mod {
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
-        Machines = new();
+        Machines = new List<Object>();
         MachineData = DataLoader.Machines(Game1.content);
+        ModdedMachineQualifiedIds = GetModdedMachinesFromMachineData();
+    }
+
+    private static List<string> GetModdedMachinesFromMachineData() {
+        return MachineData
+            .Where(kvp =>
+                kvp.Value.OutputRules is not null &&
+                kvp.Value.OutputRules
+                    .Any(outputRule => outputRule.Triggers
+                        .Any(triggerRule => triggerRule.Trigger == MachineOutputTrigger.ItemPlacedInMachine)))
+            .Select(kvp => kvp.Key)
+            .Where(x => !VanillaMachineQualifiedIds.AsList().Contains(x))
+            .ToList();
     }
 
     private void ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
@@ -96,24 +110,42 @@ internal class Mod: StardewModdingAPI.Mod {
     {
         if (!Config.Enabled) return;
         if (Game1.currentLocation is null) return;
+        if (ModdedMachineQualifiedIds is null) return;
 
         Machines = Game1.currentLocation.Objects.Values
             .Where(IsValidMachine)
             .ToList();
-        
-        // Machines = Game1.currentLocation.Objects.Values
-        //     .Where(o => MachineData.ContainsKey(o.QualifiedItemId))
-        //     .ToList();
     }
-
+    
     private bool IsValidMachine(Object o) {
-        return IsObjectJar(o) || IsObjectKeg(o) || IsObjectCask(o) ||
-               IsObjectMayonnaiseMachine(o) || IsObjectCheesePress(o) || IsObjectLoom(o) ||
-               IsObjectOilMaker(o) || IsObjectDehydrator(o) || IsObjectFishSmoker(o) ||
-               IsObjectBaitMaker(o) || IsObjectBoneMill(o) || IsObjectCharcoalKiln(o) ||
-               IsObjectCrystalarium(o) || IsObjectFurnace(o) || IsObjectRecyclingMachine(o) ||
-               IsObjectSeedMaker(o) || IsObjectSlimeEggPress(o) || IsObjectCrabPot(o) ||
-               IsObjectDeconstructor(o);
+        return IsObjectValidMachine(o, Config.JarsEnabled, VanillaMachineQualifiedIds.Jar) ||
+               IsObjectValidMachine(o, Config.KegsEnabled, VanillaMachineQualifiedIds.Keg) ||
+               IsObjectValidMachine(o, Config.CasksEnabled, VanillaMachineQualifiedIds.Cask) ||
+               IsObjectValidMachine(o, Config.MayonnaiseMachinesEnabled, VanillaMachineQualifiedIds.MayonnaiseMachine) ||
+               IsObjectValidMachine(o, Config.CheesePressesEnabled, VanillaMachineQualifiedIds.CheesePress) ||
+               IsObjectValidMachine(o, Config.LoomsEnabled, VanillaMachineQualifiedIds.Loom) ||
+               IsObjectValidMachine(o, Config.OilMakersEnabled, VanillaMachineQualifiedIds.OilMaker) ||
+               IsObjectValidMachine(o, Config.DehydratorsEnabled, VanillaMachineQualifiedIds.Dehydrator) ||
+               IsObjectValidMachine(o, Config.FishSmokersEnabled, VanillaMachineQualifiedIds.FishSmoker) ||
+               IsObjectValidMachine(o, Config.BaitMakersEnabled, VanillaMachineQualifiedIds.BaitMaker) ||
+               IsObjectValidMachine(o, Config.BoneMillsEnabled, VanillaMachineQualifiedIds.BoneMill) ||
+               IsObjectValidMachine(o, Config.CharcoalKilnsEnabled, VanillaMachineQualifiedIds.CharcoalKiln) ||
+               IsObjectValidMachine(o, Config.CrystalariumsEnabled, VanillaMachineQualifiedIds.Crystalarium) ||
+               IsObjectValidMachine(o, Config.FurnacesEnabled, VanillaMachineQualifiedIds.Furnace) ||
+               IsObjectValidMachine(o, Config.FurnacesEnabled, VanillaMachineQualifiedIds.HeavyFurnace) ||
+               IsObjectValidMachine(o, Config.RecyclingMachinesEnabled, VanillaMachineQualifiedIds.RecyclingMachine) ||
+               IsObjectValidMachine(o, Config.SeedMakersEnabled, VanillaMachineQualifiedIds.SeedMaker) ||
+               IsObjectValidMachine(o, Config.SlimeEggPressesEnabled, VanillaMachineQualifiedIds.SlimeEggPress) ||
+               IsObjectValidMachine(o, Config.CrabPotsEnabled, VanillaMachineQualifiedIds.CrabPot) ||
+               IsObjectValidMachine(o, Config.DeconstructorsEnabled, VanillaMachineQualifiedIds.Deconstructor) ||
+               IsObjectValidMachine(o, Config.GeodeCrushersEnabled, VanillaMachineQualifiedIds.GeodeCrusher) ||
+               IsObjectValidMachine(o, Config.WoodChippersEnabled, VanillaMachineQualifiedIds.WoodChipper) ||
+               (Config.ModdedMachinesEnabled && ModdedMachineQualifiedIds.Contains(o.QualifiedItemId));
+    }
+    
+    private bool IsObjectValidMachine(Object o, bool enabled, string qualifiedId) {
+        if (!enabled) return false;
+        return o.QualifiedItemId == qualifiedId;
     }
 
     private void RenderBubbles(object sender, RenderedWorldEventArgs e) {
@@ -148,103 +180,6 @@ internal class Mod: StardewModdingAPI.Mod {
             (tilePosition.Y + 37) / 10000f);
     }
 
-    #region IsObjectMethods
-    private bool IsObjectJar(Object o) {
-        if (!Config.JarsEnabled) return false;
-        return o.QualifiedItemId == "(BC)15";
-    }
-
-    private bool IsObjectKeg(Object o) {
-        if (!Config.KegsEnabled) return false;
-        return o.QualifiedItemId == "(BC)12";
-    }
-    
-    private bool IsObjectCask(Object o) {
-        if (!Config.CasksEnabled) return false;
-        return o.QualifiedItemId == "(BC)163";
-    }
-    
-    private bool IsObjectMayonnaiseMachine(Object o) {
-        if (!Config.MayonnaiseMachinesEnabled) return false;
-        return o.QualifiedItemId == "(BC)24";
-    }
-    
-    private bool IsObjectCheesePress(Object o) {
-        if (!Config.CheesePressesEnabled) return false;
-        return o.QualifiedItemId == "(BC)16";
-    }
-    
-    private bool IsObjectLoom(Object o) {
-        if (!Config.LoomsEnabled) return false;
-        return o.QualifiedItemId == "(BC)17";
-    }
-    
-    private bool IsObjectOilMaker(Object o) {
-        if (!Config.OilMakersEnabled) return false;
-        return o.QualifiedItemId == "(BC)19";
-    }
-    
-    private bool IsObjectDehydrator(Object o) {
-        if (!Config.DehydratorsEnabled) return false;
-        return o.QualifiedItemId == "(BC)Dehydrator";
-    }
-    
-    private bool IsObjectFishSmoker(Object o) {
-        if (!Config.FishSmokersEnabled) return false;
-        return o.QualifiedItemId == "(BC)FishSmoker";
-    }
-    
-    private bool IsObjectBaitMaker(Object o) {
-        if (!Config.BaitMakersEnabled) return false;
-        return o.QualifiedItemId == "(BC)BaitMaker";
-    }
-    
-    private bool IsObjectBoneMill(Object o) {
-        if (!Config.BoneMillsEnabled) return false;
-        return o.QualifiedItemId == "(BC)90";
-    }
-    
-    private bool IsObjectCharcoalKiln(Object o) {
-        if (!Config.CharcoalKilnsEnabled) return false;
-        return o.QualifiedItemId == "(BC)114";
-    }
-    
-    private bool IsObjectCrystalarium(Object o) {
-        if (!Config.CrystalariumsEnabled) return false;
-        return o.QualifiedItemId == "(BC)21";
-    }
-    
-    private bool IsObjectFurnace(Object o) {
-        if (!Config.FurnacesEnabled) return false;
-        return o.QualifiedItemId is "(BC)13" or "(BC)HeavyFurnace";
-    }
-    
-    private bool IsObjectRecyclingMachine(Object o) {
-        if (!Config.RecyclingMachinesEnabled) return false;
-        return o.QualifiedItemId == "(BC)20";
-    }
-    
-    private bool IsObjectSeedMaker(Object o) {
-        if (!Config.SeedMakersEnabled) return false;
-        return o.QualifiedItemId == "(BC)25";
-    }
-    
-    private bool IsObjectSlimeEggPress(Object o) {
-        if (!Config.SlimeEggPressesEnabled) return false;
-        return o.QualifiedItemId == "(BC)158";
-    }
-    
-    private bool IsObjectCrabPot(Object o) {
-        if (!Config.CrabPotsEnabled) return false;
-        return o.QualifiedItemId == "(O)710";
-    }
-    
-    private bool IsObjectDeconstructor(Object o) {
-        if (!Config.DeconstructorsEnabled) return false;
-        return o.QualifiedItemId == "(BC)265";
-    }
-    #endregion
-    
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
@@ -257,6 +192,50 @@ internal class Mod: StardewModdingAPI.Mod {
             name: I18n.Enabled,
             getValue: () => Config.Enabled,
             setValue: value => Config.Enabled = value
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.BubbleYOffset,
+            getValue: () => Config.OffsetY,
+            setValue: value => Config.OffsetY = value,
+            min: 0,
+            max: 128
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.EmoteInterval,
+            getValue: () => Config.EmoteInterval,
+            setValue: value => Config.EmoteInterval = value,
+            min: 0,
+            max: 1000
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.Opacity,
+            getValue: () => Config.OpacityPercent,
+            setValue: value => Config.OpacityPercent = value,
+            min: 1,
+            max: 100
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.BubbleSize,
+            getValue: () => Config.SizePercent,
+            setValue: value => Config.SizePercent = value,
+            min: 1,
+            max: 100
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.ModdedMachinesEnabled,
+            tooltip: I18n.ModdedMachinesEnabledTooltip,
+            getValue: () => Config.ModdedMachinesEnabled,
+            setValue: value => Config.ModdedMachinesEnabled = value
         );
         
         configMenu.AddBoolOption(
@@ -391,41 +370,19 @@ internal class Mod: StardewModdingAPI.Mod {
             getValue: () => Config.DeconstructorsEnabled,
             setValue: value => Config.DeconstructorsEnabled = value
         );
-
-        configMenu.AddNumberOption(
+        
+        configMenu.AddBoolOption(
             mod: ModManifest,
-            name: I18n.BubbleYOffset,
-            getValue: () => Config.OffsetY,
-            setValue: value => Config.OffsetY = value,
-            min: 0,
-            max: 128
+            name: I18n.GeodeCrushersEnabled, 
+            getValue: () => Config.GeodeCrushersEnabled,
+            setValue: value => Config.GeodeCrushersEnabled = value
         );
         
-        configMenu.AddNumberOption(
+        configMenu.AddBoolOption(
             mod: ModManifest,
-            name: I18n.EmoteInterval,
-            getValue: () => Config.EmoteInterval,
-            setValue: value => Config.EmoteInterval = value,
-            min: 0,
-            max: 1000
-        );
-        
-        configMenu.AddNumberOption(
-            mod: ModManifest,
-            name: I18n.Opacity,
-            getValue: () => Config.OpacityPercent,
-            setValue: value => Config.OpacityPercent = value,
-            min: 1,
-            max: 100
-        );
-        
-        configMenu.AddNumberOption(
-            mod: ModManifest,
-            name: I18n.BubbleSize,
-            getValue: () => Config.SizePercent,
-            setValue: value => Config.SizePercent = value,
-            min: 1,
-            max: 100
+            name: I18n.WoodChippersEnabled, 
+            getValue: () => Config.WoodChippersEnabled,
+            setValue: value => Config.WoodChippersEnabled = value
         );
     }
 }

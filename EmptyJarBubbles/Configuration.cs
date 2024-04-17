@@ -2,6 +2,7 @@ namespace EmptyJarBubbles;
 
 internal class Configuration {
     public bool Enabled { get; set; } = true;
+    public bool ModdedMachinesEnabled { get; set; } = false;
     public bool JarsEnabled { get; set; } = true;
     public bool KegsEnabled { get; set; } = true;
     public bool CasksEnabled { get; set; } = true;
@@ -21,6 +22,8 @@ internal class Configuration {
     public bool SlimeEggPressesEnabled { get; set; } = false;
     public bool CrabPotsEnabled { get; set; } = false;
     public bool DeconstructorsEnabled { get; set; } = false;
+    public bool GeodeCrushersEnabled { get; set; } = false;
+    public bool WoodChippersEnabled { get; set; } = false;
     public int OffsetY { get; set; } = 80;
     public int EmoteInterval { get; set; } = 250;
     public int OpacityPercent { get; set; } = 75;

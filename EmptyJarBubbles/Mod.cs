@@ -22,10 +22,12 @@ internal class Mod: StardewModdingAPI.Mod {
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         helper.Events.GameLoop.SaveLoaded += SaveLoaded;
+        helper.Events.GameLoop.DayStarted += DayStarted;
         helper.Events.GameLoop.ReturnedToTitle += ReturnedToTitle;
         helper.Events.GameLoop.UpdateTicked += UpdateTicked;
         helper.Events.World.ObjectListChanged += ObjectListChanged;
         helper.Events.Player.Warped += Warped;
+        helper.Events.Display.MenuChanged += MenuChanged;
     }
 
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
@@ -52,6 +54,7 @@ internal class Mod: StardewModdingAPI.Mod {
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
+        Machines = new();
         MachineData = DataLoader.Machines(Game1.content);
     }
 
@@ -63,9 +66,30 @@ internal class Mod: StardewModdingAPI.Mod {
     private void Warped(object sender, WarpedEventArgs e) {
         BuildMachineList();
     }
+    
+    private void DayStarted(object sender, DayStartedEventArgs e) {
+        BuildMachineList();
+    }
+
+    private void MenuChanged(object sender, MenuChangedEventArgs e) {
+        BuildMachineList();
+    }
 
     private void ObjectListChanged(object sender, ObjectListChangedEventArgs e) {
-        BuildMachineList();
+        if (!Config.Enabled) return;
+        
+        var removedMachines = e.Removed
+            .Where(kvp => IsValidMachine(kvp.Value))
+            .Select(kvp => kvp.Value)
+            .ToList();
+
+        var newMachines = e.Added
+            .Where(kvp => IsValidMachine(kvp.Value))
+            .Select(kvp => kvp.Value)
+            .ToList();
+
+        Machines.RemoveAll(x => removedMachines.Contains(x));
+        Machines.AddRange(newMachines);
     }
     
     private void BuildMachineList()
@@ -74,13 +98,7 @@ internal class Mod: StardewModdingAPI.Mod {
         if (Game1.currentLocation is null) return;
 
         Machines = Game1.currentLocation.Objects.Values
-            .Where(o => IsObjectJar(o) || IsObjectKeg(o) || IsObjectCask(o) ||
-                        IsObjectMayonnaiseMachine(o) || IsObjectCheesePress(o) || IsObjectLoom(o) ||
-                        IsObjectOilMaker(o) || IsObjectDehydrator(o) || IsObjectFishSmoker(o) ||
-                        IsObjectBaitMaker(o) || IsObjectBoneMill(o) || IsObjectCharcoalKiln(o) ||
-                        IsObjectCrystalarium(o) || IsObjectFurnace(o) || IsObjectRecyclingMachine(o) ||
-                        IsObjectSeedMaker(o) || IsObjectSlimeEggPress(o) || IsObjectCrabPot(o) ||
-                        IsObjectDeconstructor(o))
+            .Where(IsValidMachine)
             .ToList();
         
         // Machines = Game1.currentLocation.Objects.Values
@@ -88,7 +106,19 @@ internal class Mod: StardewModdingAPI.Mod {
         //     .ToList();
     }
 
+    private bool IsValidMachine(Object o) {
+        return IsObjectJar(o) || IsObjectKeg(o) || IsObjectCask(o) ||
+               IsObjectMayonnaiseMachine(o) || IsObjectCheesePress(o) || IsObjectLoom(o) ||
+               IsObjectOilMaker(o) || IsObjectDehydrator(o) || IsObjectFishSmoker(o) ||
+               IsObjectBaitMaker(o) || IsObjectBoneMill(o) || IsObjectCharcoalKiln(o) ||
+               IsObjectCrystalarium(o) || IsObjectFurnace(o) || IsObjectRecyclingMachine(o) ||
+               IsObjectSeedMaker(o) || IsObjectSlimeEggPress(o) || IsObjectCrabPot(o) ||
+               IsObjectDeconstructor(o);
+    }
+
     private void RenderBubbles(object sender, RenderedWorldEventArgs e) {
+        if (!Config.Enabled) return;
+        
         var readyMachines = Machines.Where(o => 
                 // MinutesUntilReady <= 0 because casks that have an item removed will be < 0
                 (o is not CrabPot && o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value) ||

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.GameData.Machines;
 using StardewValley.Objects;
 using Object = StardewValley.Object;
 
@@ -12,6 +13,8 @@ internal class Mod: StardewModdingAPI.Mod {
     internal static Configuration Config;
     internal static int CurrentEmoteFrame;
     internal static int CurrentEmoteInterval;
+    internal static List<Object> Machines;
+    internal static Dictionary<string, MachineData> MachineData;
 
     public override void Entry(IModHelper helper) {
         Config = Helper.ReadConfig<Configuration>();
@@ -21,6 +24,8 @@ internal class Mod: StardewModdingAPI.Mod {
         helper.Events.GameLoop.SaveLoaded += SaveLoaded;
         helper.Events.GameLoop.ReturnedToTitle += ReturnedToTitle;
         helper.Events.GameLoop.UpdateTicked += UpdateTicked;
+        helper.Events.World.ObjectListChanged += ObjectListChanged;
+        helper.Events.Player.Warped += Warped;
     }
 
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
@@ -47,34 +52,52 @@ internal class Mod: StardewModdingAPI.Mod {
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
+        MachineData = DataLoader.Machines(Game1.content);
     }
 
     private void ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
     {
         Helper.Events.Display.RenderedWorld -= RenderBubbles;
     }
+    
+    private void Warped(object sender, WarpedEventArgs e) {
+        BuildMachineList();
+    }
 
-    private void RenderBubbles(object sender, RenderedWorldEventArgs e) {
+    private void ObjectListChanged(object sender, ObjectListChangedEventArgs e) {
+        BuildMachineList();
+    }
+    
+    private void BuildMachineList()
+    {
         if (!Config.Enabled) return;
         if (Game1.currentLocation is null) return;
 
-        // MinutesUntilReady <= 0 because casks that have an item removed will be < 0
-        var objects = Game1.currentLocation.Objects.Values
+        Machines = Game1.currentLocation.Objects.Values
             .Where(o => IsObjectJar(o) || IsObjectKeg(o) || IsObjectCask(o) ||
                         IsObjectMayonnaiseMachine(o) || IsObjectCheesePress(o) || IsObjectLoom(o) ||
                         IsObjectOilMaker(o) || IsObjectDehydrator(o) || IsObjectFishSmoker(o) ||
                         IsObjectBaitMaker(o) || IsObjectBoneMill(o) || IsObjectCharcoalKiln(o) ||
                         IsObjectCrystalarium(o) || IsObjectFurnace(o) || IsObjectRecyclingMachine(o) ||
-                        IsObjectSeedMaker(o) || IsObjectSlimeEggPress(o) || IsObjectCrabPot(o) || 
+                        IsObjectSeedMaker(o) || IsObjectSlimeEggPress(o) || IsObjectCrabPot(o) ||
                         IsObjectDeconstructor(o))
-            .Where(o => 
+            .ToList();
+        
+        // Machines = Game1.currentLocation.Objects.Values
+        //     .Where(o => MachineData.ContainsKey(o.QualifiedItemId))
+        //     .ToList();
+    }
+
+    private void RenderBubbles(object sender, RenderedWorldEventArgs e) {
+        var readyMachines = Machines.Where(o => 
+                // MinutesUntilReady <= 0 because casks that have an item removed will be < 0
                 (o is not CrabPot && o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value) ||
                 (o is CrabPot pot && pot.bait.Value is null && pot.heldObject.Value is null))
             .ToList();
-
-        foreach (var o in objects) DrawBubbles(o, e.SpriteBatch);
+        
+        foreach (var machine in readyMachines) DrawBubbles(machine, e.SpriteBatch);
     }
-
+    
     private void DrawBubbles(Object o, SpriteBatch spriteBatch) {
         Vector2 tilePosition = o.TileLocation * 64;
         Vector2 emotePosition = Game1.GlobalToLocal(tilePosition);

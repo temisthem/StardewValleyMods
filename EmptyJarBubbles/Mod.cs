@@ -90,17 +90,15 @@ internal class Mod: StardewModdingAPI.Mod {
 
     private void ObjectListChanged(object sender, ObjectListChangedEventArgs e) {
         if (!Config.Enabled) return;
-        
+
         var removedMachines = e.Removed
             .Where(kvp => IsValidMachine(kvp.Value))
-            .Select(kvp => kvp.Value)
-            .ToList();
+            .Select(kvp => kvp.Value);
 
         var newMachines = e.Added
             .Where(kvp => IsValidMachine(kvp.Value))
-            .Select(kvp => kvp.Value)
-            .ToList();
-
+            .Select(kvp => kvp.Value);
+        
         Machines.RemoveAll(x => removedMachines.Contains(x));
         Machines.AddRange(newMachines);
     }
@@ -149,14 +147,14 @@ internal class Mod: StardewModdingAPI.Mod {
 
     private void RenderBubbles(object sender, RenderedWorldEventArgs e) {
         if (!Config.Enabled) return;
-        
-        var readyMachines = Machines.Where(o => 
-                // MinutesUntilReady <= 0 because casks that have an item removed will be < 0
-                (o is not CrabPot && o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value) ||
-                (o is CrabPot pot && pot.bait.Value is null && pot.heldObject.Value is null))
-            .ToList();
-        
-        foreach (var machine in readyMachines) DrawBubbles(machine, e.SpriteBatch);
+
+        foreach (var machine in Machines.Where(IsMachineRenderReady))
+            DrawBubbles(machine, e.SpriteBatch);
+    }
+
+    private bool IsMachineRenderReady(Object o) {
+        return (o is not CrabPot && o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value) ||
+               (o is CrabPot pot && pot.bait.Value is null && pot.heldObject.Value is null);
     }
     
     private void DrawBubbles(Object o, SpriteBatch spriteBatch) {

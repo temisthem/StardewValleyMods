@@ -3,6 +3,7 @@
   "modded-machines-enabled": "Modded Machines Enabled",
   "modded-machines-enabled-tooltip": "This will enable bubbles for ALL modded machines",
   "bubble-y-offset": "Bubble Y Offset",
+  "bubble-x-offset": "Bubble X Offset",
   "emote-interval": "Emote Interval (ms)",
   "opacity": "Opacity",
   "bubble-size": "Bubble Size",

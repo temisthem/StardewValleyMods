@@ -160,7 +160,7 @@ internal class Mod: StardewModdingAPI.Mod {
     private void DrawBubbles(Object o, SpriteBatch spriteBatch) {
         Vector2 tilePosition = o.TileLocation * 64;
         Vector2 emotePosition = Game1.GlobalToLocal(tilePosition);
-        emotePosition += new Vector2((100 - Config.SizePercent) / 100f * 32, -Config.OffsetY);
+        emotePosition += new Vector2((100 - Config.SizePercent) / 100f * 32 +Config.OffsetX, -Config.OffsetY);
         if (o is CrabPot pot) {
             emotePosition += pot.directionOffset.Value;
             emotePosition.Y += pot.yBob + 20;
@@ -197,6 +197,15 @@ internal class Mod: StardewModdingAPI.Mod {
             getValue: () => Config.OffsetY,
             setValue: value => Config.OffsetY = value,
             min: 0,
+            max: 128
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.BubbleXOffset,
+            getValue: () => Config.OffsetX,
+            setValue: value => Config.OffsetX = value,
+            min: -128,
             max: 128
         );
         

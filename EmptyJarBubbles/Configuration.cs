@@ -25,6 +25,7 @@ internal class Configuration {
     public bool GeodeCrushersEnabled { get; set; } = false;
     public bool WoodChippersEnabled { get; set; } = false;
     public int OffsetY { get; set; } = 80;
+    public int OffsetX { get; set; } = 0;
     public int EmoteInterval { get; set; } = 250;
     public int OpacityPercent { get; set; } = 75;
     public int SizePercent { get; set; } = 75;

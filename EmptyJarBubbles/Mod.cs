@@ -57,6 +57,7 @@ internal class Mod: StardewModdingAPI.Mod {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
         MachineData = DataLoader.Machines(Game1.content);
         ModdedMachineQualifiedIds = GetModdedMachinesFromMachineData();
+        ApplyZoomLevel99();
     }
 
     private static List<string> GetModdedMachinesFromMachineData() {
@@ -77,7 +78,7 @@ internal class Mod: StardewModdingAPI.Mod {
     }
     
     private void Warped(object sender, WarpedEventArgs e) {
-        BuildMachineList();
+        BuildMachineList(); 
     }
     
     private void DayStarted(object sender, DayStartedEventArgs e) {
@@ -86,6 +87,14 @@ internal class Mod: StardewModdingAPI.Mod {
 
     private void MenuChanged(object sender, MenuChangedEventArgs e) {
         BuildMachineList();
+        ApplyZoomLevel99();
+    }
+
+    private void ApplyZoomLevel99() {
+        if (!Config.Enabled) return;
+        if (!Config.ZoomLevel99Enabled) return;
+
+        Game1.options.desiredBaseZoomLevel = 0.99f;
     }
 
     private void ObjectListChanged(object sender, ObjectListChangedEventArgs e) {
@@ -234,6 +243,14 @@ internal class Mod: StardewModdingAPI.Mod {
             setValue: value => Config.SizePercent = value,
             min: 1,
             max: 100
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.ZoomLevel99Enabled,
+            tooltip: I18n.ZoomLevel99EnabledTooltip,
+            getValue: () => Config.ZoomLevel99Enabled,
+            setValue: value => Config.ZoomLevel99Enabled = value
         );
         
         configMenu.AddBoolOption(

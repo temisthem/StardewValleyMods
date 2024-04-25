@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using Object = StardewValley.Object;
 
 namespace BetterTruffles;
 
@@ -23,8 +25,18 @@ internal partial class Mod: StardewModdingAPI.Mod {
 
         harmony.Patch(
             original: AccessTools.Method(typeof(FarmAnimal), nameof(FarmAnimal.behaviors)),
-            prefix: new HarmonyMethod(typeof(Mod.FarmAnimal_behaviors_Patch),
-                nameof(Mod.FarmAnimal_behaviors_Patch.Prefix))
+            prefix: new HarmonyMethod(typeof(FarmAnimal_behaviors_Patch), 
+                nameof(FarmAnimal_behaviors_Patch.Prefix))
+        );
+        
+        harmony.Patch(
+            original: AccessTools.Method(typeof(Object), nameof(Object.draw), new [] {
+                typeof(SpriteBatch),
+                typeof(int),
+                typeof(int),
+                typeof(float)
+            }),
+            postfix: new HarmonyMethod(typeof(Object_draw_Patch), nameof(Object_draw_Patch.Postfix))
         );
     }
 
@@ -45,6 +57,56 @@ internal partial class Mod: StardewModdingAPI.Mod {
             name: I18n.Enabled,
             getValue: () => Config.Enabled,
             setValue: value => Config.Enabled = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.PigsDigInGrass,
+            getValue: () => Config.PigsDigInGrass,
+            setValue: value => Config.PigsDigInGrass = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.ShowBubbles,
+            getValue: () => Config.ShowBubbles,
+            setValue: value => Config.ShowBubbles = value
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.BubbleYOffset,
+            getValue: () => Config.OffsetY,
+            setValue: value => Config.OffsetY = value,
+            min: 0,
+            max: 128
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.BubbleXOffset,
+            getValue: () => Config.OffsetX,
+            setValue: value => Config.OffsetX = value,
+            min: -128,
+            max: 128
+        );
+
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.Opacity,
+            getValue: () => Config.OpacityPercent,
+            setValue: value => Config.OpacityPercent = value,
+            min: 1,
+            max: 100
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.BubbleSize,
+            getValue: () => Config.SizePercent,
+            setValue: value => Config.SizePercent = value,
+            min: 1,
+            max: 100
         );
     }
 }

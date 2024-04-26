@@ -78,7 +78,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
             name: I18n.BubbleYOffset,
             getValue: () => Config.OffsetY,
             setValue: value => Config.OffsetY = value,
-            min: 0,
+            min: -128,
             max: 128
         );
         

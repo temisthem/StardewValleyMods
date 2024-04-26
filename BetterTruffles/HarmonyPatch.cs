@@ -26,7 +26,8 @@ internal partial class Mod {
 
       spriteBatch.Draw(Game1.mouseCursors, 
         Game1.GlobalToLocal(Game1.viewport, new Vector2(
-          tileLocation.X * 64 - 8 + movePercent * 40, tileLocation.Y * 64 - 96 - 16 + yOffset + movePercent * 96)),
+          tileLocation.X * 64 - 8 + movePercent * 40 + Config.OffsetX, tileLocation.Y * 64 - 96 - 16 + yOffset + 
+          movePercent * 96 + Config.OffsetY)),
         new Rectangle(141, 465, 20, 24), 
         Color.White * (Config.OpacityPercent / 100f), 
         0f, 
@@ -38,13 +39,15 @@ internal partial class Mod {
       spriteBatch.Draw(
         item.GetTexture(),
         Game1.GlobalToLocal(Game1.viewport, new Vector2(
-          tileLocation.X * 64 + 32, tileLocation.Y * 64 - 64 - 8 + yOffset + movePercent * 56)),
+          tileLocation.X * 64 + 32 + Config.OffsetX, tileLocation.Y * 64 - 64 - 8 + yOffset + movePercent * 56 +
+           Config.OffsetY)),
         item.GetSourceRect(),
         Color.White * (Config.OpacityPercent / 100f),
         0f, 
         new Vector2(8f, 8f), 
         4f * (Config.SizePercent / 100f),
-        SpriteEffects.None, base_sort + 1E-05f
+        SpriteEffects.None, 
+        base_sort + 1E-05f
       );
     }
   }  

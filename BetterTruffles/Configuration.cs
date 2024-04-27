@@ -1,5 +1,3 @@
-using System.Data.SqlTypes;
-
 namespace BetterTruffles; 
 
 internal class Configuration {

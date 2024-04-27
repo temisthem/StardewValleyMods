@@ -94,6 +94,13 @@ internal partial class Mod: StardewModdingAPI.Mod {
             getValue: () => Config.HideWhenUnusable,
             setValue: value => Config.HideWhenUnusable = value
         );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.HideWhenNoCrop,
+            getValue: () => Config.HideWhenNoCrop,
+            setValue: value => Config.HideWhenNoCrop = value
+        );
 
         configMenu.AddNumberOption(
             mod: ModManifest,

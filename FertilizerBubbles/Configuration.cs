@@ -8,6 +8,7 @@ internal class Configuration {
     public bool DisplayWhenHeld { get; set; } = true;
     public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
     public bool HideWhenUnusable { get; set; } = true;
+    public bool HideWhenNoCrop { get; set; } = false;
 
     public int OffsetY { get; set; } = 0;
     public int OffsetX { get; set; } = 0;

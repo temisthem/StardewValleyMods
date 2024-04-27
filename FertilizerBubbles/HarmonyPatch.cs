@@ -15,8 +15,12 @@ internal partial class Mod {
         
         public static void Postfix(HoeDirt __instance, SpriteBatch spriteBatch) {
             if (!Config.Enabled) return;
+            
             if (__instance.HasFertilizer()) return;
+            if (Config.HideWhenNoCrop && __instance.crop is null) return;
+            
             var currentItem = Game1.player.CurrentItem;
+            
             if (Config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) return;
             if (Config.HideWhenUnusable && currentItem is not null && 
                 !__instance.CanApplyFertilizer(currentItem.QualifiedItemId)) return;

@@ -1,7 +1,7 @@
 {
   "Name": "Where's My Horse",
   "Author": "temisthem",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "Description": "I found my horse.",
   "UniqueID": "tem696969696969.WheresMyHorse",
   "EntryDll": "WheresMyHorse.dll",

@@ -9,7 +9,9 @@ internal class Configuration {
 
     public bool RenderOnTop { get; set; } = true;
     public bool DisableOnMount { get; set; } = true;
+    public bool DisableOnMapChange { get; set; } = true;
     public bool OnlyMyHorse { get; set; } = false;
+    public bool AlwaysRender { get; set; } = false;
     public int OffsetY { get; set; } = 0;
     public int OffsetX { get; set; } = 0;
     public int EmoteInterval { get; set; } = 250;

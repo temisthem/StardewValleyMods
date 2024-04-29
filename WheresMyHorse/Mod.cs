@@ -20,8 +20,10 @@ internal partial class Mod: StardewModdingAPI.Mod {
         I18n.Init(helper.Translation);
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+        helper.Events.GameLoop.SaveLoaded += SaveLoaded;
         helper.Events.GameLoop.UpdateTicked += UpdateTicked;
-        Helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
+        helper.Events.Player.Warped += Warped;
+        helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
         ApplyHarmonyPatches();
     }
 
@@ -37,6 +39,14 @@ internal partial class Mod: StardewModdingAPI.Mod {
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
         var configMenu = ModHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);
+    }
+    
+    private void Warped(object sender, WarpedEventArgs e) {
+        if (Config.DisableOnMapChange) EmoteEnabled = false;
+    }
+    
+    private void SaveLoaded(object sender, SaveLoadedEventArgs e) {
+        EmoteEnabled = false;
     }
     
     private void UpdateTicked(object sender, UpdateTickedEventArgs e) {
@@ -58,7 +68,18 @@ internal partial class Mod: StardewModdingAPI.Mod {
     
     private void Input_ButtonsChanged(object sender, ButtonsChangedEventArgs e) {
         if (!Config.Enabled) return;
-        if (Config.DoEmoteKey.JustPressed()) EmoteEnabled = !EmoteEnabled;
+        if (Game1.player.isRidingHorse()) return;
+        if (!Config.DoEmoteKey.JustPressed()) return;
+        
+        if (IsHorseInLocation()) EmoteEnabled = !EmoteEnabled;
+        else Game1.player.doEmote(8);
+    }
+
+    private static bool IsHorseInLocation() {
+        var horses = Game1.player.currentLocation.characters.OfType<Horse>().ToList();
+        return Config.OnlyMyHorse ?
+            horses.Any(horse => horse.getOwner() == Game1.player) :
+            horses.Any();
     }
 
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
@@ -98,9 +119,23 @@ internal partial class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddBoolOption(
             mod: ModManifest,
+            name: I18n.DisableOnMapChange,
+            getValue: () => Config.DisableOnMapChange,
+            setValue: value => Config.DisableOnMapChange = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
             name: I18n.OnlyMyHorse,
             getValue: () => Config.OnlyMyHorse,
             setValue: value => Config.OnlyMyHorse = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.AlwaysRender,
+            getValue: () => Config.AlwaysRender,
+            setValue: value => Config.AlwaysRender = value
         );
 
         configMenu.AddNumberOption(

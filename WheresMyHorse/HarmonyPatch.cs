@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 
@@ -14,10 +15,14 @@ internal partial class Mod {
             if (__instance.rider != null) return;
             if (Config.OnlyMyHorse && __instance.getOwner() != Game1.player) return;
             if (!EmoteEnabled) return;
-            
-            Vector2 localPosition = __instance.getLocalPosition(Game1.viewport) + 
-                                    new Vector2(Config.OffsetX, Config.OffsetY - 96f);
+
+            float offsetX = Config.OffsetX + (__instance.GetSpriteWidthForPositioning() == 16 ? 0f : 32f);
+            float offsetY = Config.OffsetY - 96f;
+
+            Vector2 localPosition = __instance.getLocalPosition(Game1.viewport) + new Vector2(offsetX, offsetY);
+
             float num = __instance.StandingPixel.Y + 1;
+
             switch (__instance.FacingDirection)
             {
                 case 0:

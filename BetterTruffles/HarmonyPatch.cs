@@ -15,7 +15,7 @@ internal partial class Mod {
     public static void Postfix(Object __instance, SpriteBatch spriteBatch, int x, int y, float alpha = 1f) {
       if (!Config.Enabled) return;
       if (!Config.ShowBubbles) return;
-      if (__instance.QualifiedItemId != "(O)430") return;
+      if (__instance.QualifiedItemId != "(O)430" && !__instance.HasContextTag("temisthem_bettertruffles")) return;
 
       var item = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId);
       var tileLocation = __instance.TileLocation;

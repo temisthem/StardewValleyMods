@@ -54,7 +54,7 @@ internal partial class Mod {
   public class FarmAnimal_behaviors_Patch {
     public static bool Prefix(ref bool __result, FarmAnimal __instance, GameTime time, GameLocation location) {
       if (!Config.Enabled) return true;
-      if (!Config.PigsDigInGrass) return true;
+      if (!Config.PigsDigInGrass && !Config.PigsDigInFlooring) return true;
       
       if (!Game1.IsMasterGame) {
         __result = false;
@@ -186,9 +186,16 @@ internal partial class Mod {
             }
 
             location.terrainFeatures.TryGetValue(key, out var terrainFeature);
-            if (terrainFeature != null && terrainFeature is not Grass) {
-              __result = false;
-              return false;
+            switch (terrainFeature) {
+               case null:
+                continue;
+              case Grass when Config.PigsDigInGrass:
+                continue;
+              case Flooring when Config.PigsDigInFlooring:
+                continue;
+              default:
+                __result = false;
+                return false;
             }
           }
           if (Game1.player.currentLocation.Equals(location))
@@ -257,5 +264,4 @@ internal partial class Mod {
       return false;
     }
   }
-   
 }

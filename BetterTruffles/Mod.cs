@@ -68,6 +68,13 @@ internal partial class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddBoolOption(
             mod: ModManifest,
+            name: I18n.PigsDigInFlooring,
+            getValue: () => Config.PigsDigInFlooring,
+            setValue: value => Config.PigsDigInFlooring = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
             name: I18n.ShowBubbles,
             getValue: () => Config.ShowBubbles,
             setValue: value => Config.ShowBubbles = value

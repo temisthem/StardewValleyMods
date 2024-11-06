@@ -106,7 +106,7 @@ internal partial class Mod {
           }
         }
       }
-      if ((bool) __instance.isEating.Value)
+      if (__instance.isEating.Value)
       {
         if (home != null && home.getRectForAnimalDoor().Intersects(__instance.GetBoundingBox()))
         {
@@ -139,14 +139,14 @@ internal partial class Mod {
         __result = true;
         return false;
       }
-      if (!__instance.isSwimming.Value && location.IsOutdoors && (int) __instance.fullness.Value < 195 && Game1.random.NextDouble() < 0.002 && FarmAnimal.NumPathfindingThisTick < FarmAnimal.MaxPathfindingPerTick)
+      if (!__instance.isSwimming.Value && location.IsOutdoors && __instance.fullness.Value < 195 && Game1.random.NextDouble() < 0.002 && FarmAnimal.NumPathfindingThisTick < FarmAnimal.MaxPathfindingPerTick)
       {
         ++FarmAnimal.NumPathfindingThisTick;
         __instance.controller = new PathFindController((Character) __instance, location, new PathFindController.isAtEnd(FarmAnimal.grassEndPointFunction), -1, new PathFindController.endBehavior(FarmAnimal.behaviorAfterFindingGrassPatch), 200, Point.Zero);
         followTarget.SetValue((FarmAnimal) null);
         followTargetPosition.SetValue(new Point?());
       }
-      if (Game1.timeOfDay >= 1700 && location.IsOutdoors && __instance.controller == null && Game1.random.NextDouble() < 0.002 && (bool) home.animalDoorOpen.Value)
+      if (Game1.timeOfDay >= 1700 && location.IsOutdoors && __instance.controller == null && Game1.random.NextDouble() < 0.002 && home.animalDoorOpen.Value)
       {
         if (!location.farmers.Any())
         {
@@ -162,102 +162,97 @@ internal partial class Mod {
         if (FarmAnimal.NumPathfindingThisTick < FarmAnimal.MaxPathfindingPerTick)
         {
           ++FarmAnimal.NumPathfindingThisTick;
-          __instance.controller = new PathFindController((Character) __instance, location, new PathFindController.isAtEnd(PathFindController.isAtEndPoint), 0, (PathFindController.endBehavior) null, 200, new Point((int) home.tileX + home.animalDoor.X, (int) home.tileY + home.animalDoor.Y));
+          __instance.controller = new PathFindController((Character) __instance, location, new PathFindController.isAtEnd(PathFindController.isAtEndPoint), 0, (PathFindController.endBehavior) null, 200, new Point(home.tileX.Value + home.animalDoor.X, home.tileY.Value + home.animalDoor.Y));
           followTarget.SetValue((FarmAnimal) null);
           followTargetPosition.SetValue(new Point?());
         }
       }
-      if (location.IsOutdoors && !location.IsRainingHere() && !location.IsWinterHere() && __instance.currentProduce.Value != null && __instance.isAdult())
+      if (location.IsOutdoors && !location.IsRainingHere() && !location.IsWinterHere() && __instance.currentProduce.Value != null && __instance.isAdult() && __instance.GetHarvestType().GetValueOrDefault() == FarmAnimalHarvestType.DigUp && Game1.random.NextDouble() < 0.0002)
       {
-        FarmAnimalHarvestType? harvestType = __instance.GetHarvestType();
-        FarmAnimalHarvestType animalHarvestType = FarmAnimalHarvestType.DigUp;
-        if (harvestType.GetValueOrDefault() == animalHarvestType & harvestType.HasValue && Game1.random.NextDouble() < 0.0002)
+        Object produce = ItemRegistry.Create<Object>(__instance.currentProduce.Value);
+        Microsoft.Xna.Framework.Rectangle boundingBox = __instance.GetBoundingBox();
+        for (int corner = 0; corner < 4; ++corner)
         {
-          Object produce = ItemRegistry.Create<Object>(__instance.currentProduce.Value);
-          Microsoft.Xna.Framework.Rectangle boundingBox = __instance.GetBoundingBox();
-          for (int corner = 0; corner < 4; ++corner)
-          {
-            Vector2 cornersOfThisRectangle = Utility.getCornersOfThisRectangle(ref boundingBox, corner);
-            Vector2 key = new Vector2((float) (int) ((double) cornersOfThisRectangle.X / 64.0), (float) (int) ((double) cornersOfThisRectangle.Y / 64.0));
-            
-            if (location.objects.ContainsKey(key)) {
+          Vector2 cornersOfThisRectangle = Utility.getCornersOfThisRectangle(ref boundingBox, corner);
+          Vector2 key = new Vector2((float) (int) ((double) cornersOfThisRectangle.X / 64.0), (float) (int) ((double) cornersOfThisRectangle.Y / 64.0));
+          
+          if (location.objects.ContainsKey(key)) {
+            __result = false;
+            return false;
+          }
+
+          location.terrainFeatures.TryGetValue(key, out var terrainFeature);
+          switch (terrainFeature) {
+            case null:
+              continue;
+            case Grass when Config.PigsDigInGrass:
+              continue;
+            case Flooring when Config.PigsDigInFlooring:
+              continue;
+            default:
               __result = false;
               return false;
-            }
-
-            location.terrainFeatures.TryGetValue(key, out var terrainFeature);
-            switch (terrainFeature) {
-               case null:
-                continue;
-              case Grass when Config.PigsDigInGrass:
-                continue;
-              case Flooring when Config.PigsDigInFlooring:
-                continue;
-              default:
-                __result = false;
-                return false;
-            }
           }
-          if (Game1.player.currentLocation.Equals(location))
-          {
-            DelayedAction.playSoundAfterDelay("dirtyHit", 450);
-            DelayedAction.playSoundAfterDelay("dirtyHit", 900);
-            DelayedAction.playSoundAfterDelay("dirtyHit", 1350);
-          }
-          if (location.Equals(Game1.currentLocation))
-          {
-            switch (__instance.FacingDirection)
-            {
-              case 0:
-                __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
-                {
-                  new FarmerSprite.AnimationFrame(9, 250),
-                  new FarmerSprite.AnimationFrame(11, 250),
-                  new FarmerSprite.AnimationFrame(9, 250),
-                  new FarmerSprite.AnimationFrame(11, 250),
-                  new FarmerSprite.AnimationFrame(9, 250),
-                  new FarmerSprite.AnimationFrame(11, 250, false, false, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
-                });
-                break;
-              case 1:
-                __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
-                {
-                  new FarmerSprite.AnimationFrame(5, 250),
-                  new FarmerSprite.AnimationFrame(7, 250),
-                  new FarmerSprite.AnimationFrame(5, 250),
-                  new FarmerSprite.AnimationFrame(7, 250),
-                  new FarmerSprite.AnimationFrame(5, 250),
-                  new FarmerSprite.AnimationFrame(7, 250, false, false, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
-                });
-                break;
-              case 2:
-                __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
-                {
-                  new FarmerSprite.AnimationFrame(1, 250),
-                  new FarmerSprite.AnimationFrame(3, 250),
-                  new FarmerSprite.AnimationFrame(1, 250),
-                  new FarmerSprite.AnimationFrame(3, 250),
-                  new FarmerSprite.AnimationFrame(1, 250),
-                  new FarmerSprite.AnimationFrame(3, 250, false, false, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
-                });
-                break;
-              case 3:
-                __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
-                {
-                  new FarmerSprite.AnimationFrame(5, 250, false, true),
-                  new FarmerSprite.AnimationFrame(7, 250, false, true),
-                  new FarmerSprite.AnimationFrame(5, 250, false, true),
-                  new FarmerSprite.AnimationFrame(7, 250, false, true),
-                  new FarmerSprite.AnimationFrame(5, 250, false, true),
-                  new FarmerSprite.AnimationFrame(7, 250, false, true, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
-                });
-                break;
-            }
-            __instance.Sprite.loop = false;
-          }
-          else
-            __instance.DigUpProduce(location, produce);
         }
+        if (Game1.player.currentLocation.Equals(location))
+        {
+          DelayedAction.playSoundAfterDelay("dirtyHit", 450);
+          DelayedAction.playSoundAfterDelay("dirtyHit", 900);
+          DelayedAction.playSoundAfterDelay("dirtyHit", 1350);
+        }
+        if (location.Equals(Game1.currentLocation))
+        {
+          switch (__instance.FacingDirection)
+          {
+            case 0:
+              __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
+              {
+                new FarmerSprite.AnimationFrame(9, 250),
+                new FarmerSprite.AnimationFrame(11, 250),
+                new FarmerSprite.AnimationFrame(9, 250),
+                new FarmerSprite.AnimationFrame(11, 250),
+                new FarmerSprite.AnimationFrame(9, 250),
+                new FarmerSprite.AnimationFrame(11, 250, false, false, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
+              });
+              break;
+            case 1:
+              __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
+              {
+                new FarmerSprite.AnimationFrame(5, 250),
+                new FarmerSprite.AnimationFrame(7, 250),
+                new FarmerSprite.AnimationFrame(5, 250),
+                new FarmerSprite.AnimationFrame(7, 250),
+                new FarmerSprite.AnimationFrame(5, 250),
+                new FarmerSprite.AnimationFrame(7, 250, false, false, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
+              });
+              break;
+            case 2:
+              __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
+              {
+                new FarmerSprite.AnimationFrame(1, 250),
+                new FarmerSprite.AnimationFrame(3, 250),
+                new FarmerSprite.AnimationFrame(1, 250),
+                new FarmerSprite.AnimationFrame(3, 250),
+                new FarmerSprite.AnimationFrame(1, 250),
+                new FarmerSprite.AnimationFrame(3, 250, false, false, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
+              });
+              break;
+            case 3:
+              __instance.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
+              {
+                new FarmerSprite.AnimationFrame(5, 250, false, true),
+                new FarmerSprite.AnimationFrame(7, 250, false, true),
+                new FarmerSprite.AnimationFrame(5, 250, false, true),
+                new FarmerSprite.AnimationFrame(7, 250, false, true),
+                new FarmerSprite.AnimationFrame(5, 250, false, true),
+                new FarmerSprite.AnimationFrame(7, 250, false, true, (AnimatedSprite.endOfAnimationBehavior) (_ => __instance.DigUpProduce(location, produce)))
+              });
+              break;
+          }
+          __instance.Sprite.loop = false;
+        }
+        else
+          __instance.DigUpProduce(location, produce);
       }
 
       __result = false;

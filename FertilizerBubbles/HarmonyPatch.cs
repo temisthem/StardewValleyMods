@@ -21,28 +21,28 @@ internal partial class Mod {
         }
         
         public static void Postfix(HoeDirt __instance, SpriteBatch spriteBatch) {
-            if (!Config.Enabled) return;
+            if (!_config.Enabled) return;
 
-            if (Config.DisplayBubbleForFertilizers) {
+            if (_config.DisplayBubbleForFertilizers) {
                 DrawFertilizerBubble(__instance, spriteBatch);
             }
 
-            if (Config.DisplayBubbleForSeeds) {
+            if (_config.DisplayBubbleForSeeds) {
                 DrawSeedBubble(__instance, spriteBatch);
             }
         }
 
         private static void DrawFertilizerBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
             if (__instance.HasFertilizer()) return;
-            if (Config.HideWhenNoCrop && __instance.crop is null) return;
+            if (_config.HideWhenNoCrop && __instance.crop is null) return;
             
             var currentItem = Game1.player.CurrentItem;
             
-            if (Config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) return;
+            if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) return;
             if (Game1.currentLocation.objects.TryGetValue(__instance.Tile, out _)) return;
-            if (Config.HideWhenUnusable && currentItem is not null && 
+            if (_config.HideWhenUnusable && currentItem is not null && 
                 !__instance.CanApplyFertilizer(currentItem.QualifiedItemId)) return;
-            if (!Config.DisplayWhenHeld && !ToggleEmoteEnabled) return;
+            if (!_config.DisplayWhenHeld && !_toggleEmoteEnabled) return;
             if (IsItemSeed(currentItem)) return;
             
             DrawBubble(__instance, spriteBatch);
@@ -64,14 +64,14 @@ internal partial class Mod {
 
             spriteBatch.Draw(Game1.emoteSpriteSheet,
                 emotePosition, 
-                new Rectangle(CurrentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width, 
-                    CurrentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16, 
+                new Rectangle(_currentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width, 
+                    _currentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16, 
                     16, 
                     16),
-                Color.White * (Config.OpacityPercent / 100f), 
+                Color.White * (_config.OpacityPercent / 100f), 
                 0f,
                 Vector2.Zero, 
-                4f * Config.SizePercent / 100f, 
+                4f * _config.SizePercent / 100f, 
                 SpriteEffects.None, 
                 (tilePosition.Y * 64 + 37) / 10000f);
         }
@@ -79,9 +79,9 @@ internal partial class Mod {
         private static Vector2 GetEmotePosition(HoeDirt __instance, out Vector2 emotePosition) {
             Vector2 tilePosition = __instance.Tile;
             emotePosition = Game1.GlobalToLocal(tilePosition * 64);
-            float movePercent = (100 - Config.SizePercent) / 100f;
+            float movePercent = (100 - _config.SizePercent) / 100f;
             emotePosition.Y -= 48 - movePercent * 32;
-            emotePosition += new Vector2(movePercent * 32 + Config.OffsetX, movePercent * 32 + Config.OffsetY);
+            emotePosition += new Vector2(movePercent * 32 + _config.OffsetX, movePercent * 32 + _config.OffsetY);
             return tilePosition;
         }
     }

@@ -7,15 +7,15 @@ using StardewValley.TerrainFeatures;
 namespace FertilizerBubbles;
 
 internal partial class Mod: StardewModdingAPI.Mod {
-    internal static Configuration Config;
-    internal static IModHelper ModHelper;
-    internal static int CurrentEmoteInterval;
-    internal static int CurrentEmoteFrame;
-    internal static bool ToggleEmoteEnabled;
+    private static Configuration _config;
+    private static IModHelper _modHelper;
+    private static int _currentEmoteInterval;
+    private static int _currentEmoteFrame;
+    private static bool _toggleEmoteEnabled;
 
     public override void Entry(IModHelper helper) {
-        Config = helper.ReadConfig<Configuration>();
-        ModHelper = helper;
+        _config = helper.ReadConfig<Configuration>();
+        _modHelper = helper;
         I18n.Init(helper.Translation);
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -34,93 +34,93 @@ internal partial class Mod: StardewModdingAPI.Mod {
     }
 
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
-        var configMenu = ModHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+        var configMenu = _modHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);
     }
     
     private void Input_ButtonsChanged(object sender, ButtonsChangedEventArgs e) {
-        if (!Config.Enabled) return;
-        if (Config.ToggleEmoteKey.JustPressed()) ToggleEmoteEnabled = !ToggleEmoteEnabled;
+        if (!_config.Enabled) return;
+        if (_config.ToggleEmoteKey.JustPressed()) _toggleEmoteEnabled = !_toggleEmoteEnabled;
     }
     
     private void UpdateTicked(object sender, UpdateTickedEventArgs e) {
-        if (!Config.Enabled) return;
+        if (!_config.Enabled) return;
         AnimateEmote();
     }
 
     private static void AnimateEmote() {
-        CurrentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+        _currentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
 
-        if (CurrentEmoteFrame is < 16 or > 19) CurrentEmoteFrame = 16;
-        if (CurrentEmoteInterval > Config.EmoteInterval) {
-            if (CurrentEmoteFrame < 19) CurrentEmoteFrame++;
-            else CurrentEmoteFrame = 16;
-            CurrentEmoteInterval = 0;
+        if (_currentEmoteFrame is < 16 or > 19) _currentEmoteFrame = 16;
+        if (_currentEmoteInterval > _config.EmoteInterval) {
+            if (_currentEmoteFrame < 19) _currentEmoteFrame++;
+            else _currentEmoteFrame = 16;
+            _currentEmoteInterval = 0;
         }
     }
 
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
-            reset: () => Config = new Configuration(),
-            save: () => ModHelper.WriteConfig(Config)
+            reset: () => _config = new Configuration(),
+            save: () => _modHelper.WriteConfig(_config)
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.Enabled,
-            getValue: () => Config.Enabled,
-            setValue: value => Config.Enabled = value
+            getValue: () => _config.Enabled,
+            setValue: value => _config.Enabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DisplayBubbleForFertilizers,
-            getValue: () => Config.DisplayBubbleForFertilizers,
-            setValue: value => Config.DisplayBubbleForFertilizers = value
+            getValue: () => _config.DisplayBubbleForFertilizers,
+            setValue: value => _config.DisplayBubbleForFertilizers = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DisplayBubbleForSeeds,
-            getValue: () => Config.DisplayBubbleForSeeds,
-            setValue: value => Config.DisplayBubbleForSeeds = value
+            getValue: () => _config.DisplayBubbleForSeeds,
+            setValue: value => _config.DisplayBubbleForSeeds = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DisplayWhenHeld,
-            getValue: () => Config.DisplayWhenHeld,
-            setValue: value => Config.DisplayWhenHeld = value
+            getValue: () => _config.DisplayWhenHeld,
+            setValue: value => _config.DisplayWhenHeld = value
         );
         
         configMenu.AddKeybindList(
             mod: ModManifest,
             name: I18n.ToggleEmoteKey,
             tooltip: I18n.ToggleEmoteKeyTooltip,
-            getValue: () => Config.ToggleEmoteKey,
-            setValue: value => Config.ToggleEmoteKey = value
+            getValue: () => _config.ToggleEmoteKey,
+            setValue: value => _config.ToggleEmoteKey = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.HideWhenUnusable,
-            getValue: () => Config.HideWhenUnusable,
-            setValue: value => Config.HideWhenUnusable = value
+            getValue: () => _config.HideWhenUnusable,
+            setValue: value => _config.HideWhenUnusable = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.HideWhenNoCrop,
-            getValue: () => Config.HideWhenNoCrop,
-            setValue: value => Config.HideWhenNoCrop = value
+            getValue: () => _config.HideWhenNoCrop,
+            setValue: value => _config.HideWhenNoCrop = value
         );
 
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleYOffset,
-            getValue: () => Config.OffsetY,
-            setValue: value => Config.OffsetY = value,
+            getValue: () => _config.OffsetY,
+            setValue: value => _config.OffsetY = value,
             min: -128,
             max: 128
         );
@@ -128,8 +128,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleXOffset,
-            getValue: () => Config.OffsetX,
-            setValue: value => Config.OffsetX = value,
+            getValue: () => _config.OffsetX,
+            setValue: value => _config.OffsetX = value,
             min: -128,
             max: 128
         );
@@ -137,8 +137,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.EmoteInterval,
-            getValue: () => Config.EmoteInterval,
-            setValue: value => Config.EmoteInterval = value,
+            getValue: () => _config.EmoteInterval,
+            setValue: value => _config.EmoteInterval = value,
             min: 0,
             max: 1000
         );
@@ -146,8 +146,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.Opacity,
-            getValue: () => Config.OpacityPercent,
-            setValue: value => Config.OpacityPercent = value,
+            getValue: () => _config.OpacityPercent,
+            setValue: value => _config.OpacityPercent = value,
             min: 1,
             max: 100
         );
@@ -155,8 +155,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleSize,
-            getValue: () => Config.SizePercent,
-            setValue: value => Config.SizePercent = value,
+            getValue: () => _config.SizePercent,
+            setValue: value => _config.SizePercent = value,
             min: 1,
             max: 100
         );

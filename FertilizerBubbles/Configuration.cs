@@ -5,6 +5,8 @@ namespace FertilizerBubbles;
 
 internal class Configuration {
     public bool Enabled { get; set; } = true;
+    public bool DisplayBubbleForFertilizers { get; set; } = true;
+    public bool DisplayBubbleForSeeds { get; set; } = false;
     public bool DisplayWhenHeld { get; set; } = true;
     public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
     public bool HideWhenUnusable { get; set; } = true;

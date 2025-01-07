@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.TerrainFeatures;
+using Object = StardewValley.Object;
 
 namespace FertilizerBubbles; 
 
@@ -12,26 +13,55 @@ internal partial class Mod {
             if (item.QualifiedItemId == "(O)805") return false; // Tree Fertilizer
             return item.HasContextTag("fertilizer_item") || item.HasContextTag("quality_fertilizer_item");
         }
+
+        private static bool IsItemSeed(Item item) {
+            if (item is null) return false;
+            var obj = new Object(item.ItemId, 1);
+            return obj.Type  == "Seeds";
+        }
         
         public static void Postfix(HoeDirt __instance, SpriteBatch spriteBatch) {
             if (!Config.Enabled) return;
-            
+
+            if (Config.DisplayBubbleForFertilizers) {
+                DrawFertilizerBubble(__instance, spriteBatch);
+            }
+
+            if (Config.DisplayBubbleForSeeds) {
+                DrawSeedBubble(__instance, spriteBatch);
+            }
+        }
+
+        private static void DrawFertilizerBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
             if (__instance.HasFertilizer()) return;
             if (Config.HideWhenNoCrop && __instance.crop is null) return;
             
             var currentItem = Game1.player.CurrentItem;
             
             if (Config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) return;
+            if (Game1.currentLocation.objects.TryGetValue(__instance.Tile, out _)) return;
             if (Config.HideWhenUnusable && currentItem is not null && 
                 !__instance.CanApplyFertilizer(currentItem.QualifiedItemId)) return;
             if (!Config.DisplayWhenHeld && !ToggleEmoteEnabled) return;
+            if (IsItemSeed(currentItem)) return;
             
-            Vector2 tilePosition = __instance.Tile;
-            Vector2 emotePosition = Game1.GlobalToLocal(tilePosition * 64);
-            float movePercent = (100 - Config.SizePercent) / 100f;
-            emotePosition.Y -= 48 - movePercent * 32;
-            emotePosition += new Vector2(movePercent * 32 + Config.OffsetX, movePercent * 32 + Config.OffsetY);
-                
+            DrawBubble(__instance, spriteBatch);
+        }
+        
+        private static void DrawSeedBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
+            var currentItem = Game1.player.CurrentItem;
+            
+            if (__instance.crop is not null) return;
+            if (Game1.currentLocation.objects.TryGetValue(__instance.Tile, out _)) return;
+            if (currentItem is not null && !__instance.canPlantThisSeedHere(currentItem.ItemId)) return;
+            if (!IsItemSeed(currentItem)) return;
+
+            DrawBubble(__instance, spriteBatch);
+        }
+
+        private static void DrawBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
+            var tilePosition = GetEmotePosition(__instance, out var emotePosition);
+
             spriteBatch.Draw(Game1.emoteSpriteSheet,
                 emotePosition, 
                 new Rectangle(CurrentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width, 
@@ -44,6 +74,15 @@ internal partial class Mod {
                 4f * Config.SizePercent / 100f, 
                 SpriteEffects.None, 
                 (tilePosition.Y * 64 + 37) / 10000f);
+        }
+        
+        private static Vector2 GetEmotePosition(HoeDirt __instance, out Vector2 emotePosition) {
+            Vector2 tilePosition = __instance.Tile;
+            emotePosition = Game1.GlobalToLocal(tilePosition * 64);
+            float movePercent = (100 - Config.SizePercent) / 100f;
+            emotePosition.Y -= 48 - movePercent * 32;
+            emotePosition += new Vector2(movePercent * 32 + Config.OffsetX, movePercent * 32 + Config.OffsetY);
+            return tilePosition;
         }
     }
 

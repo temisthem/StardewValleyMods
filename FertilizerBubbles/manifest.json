@@ -1,7 +1,7 @@
 {
   "Name": "Fertilizer Bubbles",
   "Author": "temisthem",
-  "Version": "1.0.0",
+  "Version": "1.0.1-beta",
   "Description": "I can finally stop squinting at soil.",
   "UniqueID": "tem696969696969.FertilizerBubbles",
   "EntryDll": "FertilizerBubbles.dll",

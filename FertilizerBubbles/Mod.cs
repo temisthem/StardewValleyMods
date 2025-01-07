@@ -75,6 +75,20 @@ internal partial class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddBoolOption(
             mod: ModManifest,
+            name: I18n.DisplayBubbleForFertilizers,
+            getValue: () => Config.DisplayBubbleForFertilizers,
+            setValue: value => Config.DisplayBubbleForFertilizers = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.DisplayBubbleForSeeds,
+            getValue: () => Config.DisplayBubbleForSeeds,
+            setValue: value => Config.DisplayBubbleForSeeds = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
             name: I18n.DisplayWhenHeld,
             getValue: () => Config.DisplayWhenHeld,
             setValue: value => Config.DisplayWhenHeld = value

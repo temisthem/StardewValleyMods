@@ -1,5 +1,7 @@
 ﻿{
   "enabled": "Enabled",
+  "display-bubble-for-fertilizers": "Display bubble for fertilizer",
+  "display-bubble-for-seeds": "Display bubble for seeds",
   "display-when-held": "Display when fertilizer is held",
   "toggle-emote-key": "Toggle Emote Key",
   "toggle-emote-key-tooltip": "Only works when 'Display when fertilizer is held' is disabled",

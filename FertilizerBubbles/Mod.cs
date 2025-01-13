@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 
 namespace FertilizerBubbles;
@@ -30,6 +32,16 @@ internal partial class Mod: StardewModdingAPI.Mod {
         harmony.Patch(
             original: AccessTools.Method(typeof(HoeDirt), nameof(HoeDirt.draw)),
             postfix: new HarmonyMethod(typeof(HoeDirt_draw_Patch), nameof(HoeDirt_draw_Patch.Postfix))
+        );
+        
+        harmony.Patch(
+            original: AccessTools.Method(typeof(IndoorPot), nameof(IndoorPot.draw), new [] {
+                typeof(SpriteBatch),
+                typeof(int),
+                typeof(int),
+                typeof(float)
+            }),
+            postfix: new HarmonyMethod(typeof(IndoorPot_draw_Patch), nameof(IndoorPot_draw_Patch.Postfix))
         );
     }
 
@@ -71,6 +83,13 @@ internal partial class Mod: StardewModdingAPI.Mod {
             name: I18n.Enabled,
             getValue: () => _config.Enabled,
             setValue: value => _config.Enabled = value
+        );
+        
+        configMenu.AddNumberOption(
+            mod: ModManifest,
+            name: I18n.Enabled,
+            getValue: () => _config.debugOffset,
+            setValue: value => _config.debugOffset = value
         );
         
         configMenu.AddBoolOption(

@@ -167,7 +167,7 @@ internal partial class Mod {
           followTargetPosition.SetValue(new Point?());
         }
       }
-      if (location.IsOutdoors && !location.IsRainingHere() && !location.IsWinterHere() && __instance.currentProduce.Value != null && __instance.isAdult() && __instance.GetHarvestType().GetValueOrDefault() == FarmAnimalHarvestType.DigUp && Game1.random.NextDouble() < 0.0002)
+      if ((BetterPigsApi?.CanDigUpProduce(__instance) ?? false) || (location.IsOutdoors && !location.IsRainingHere() && !location.IsWinterHere() && __instance.currentProduce.Value != null && __instance.isAdult() && __instance.GetHarvestType().GetValueOrDefault() == FarmAnimalHarvestType.DigUp && Game1.random.NextDouble() < 0.0002))
       {
         Object produce = ItemRegistry.Create<Object>(__instance.currentProduce.Value);
         Microsoft.Xna.Framework.Rectangle boundingBox = __instance.GetBoundingBox();

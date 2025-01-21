@@ -10,6 +10,7 @@ namespace BetterTruffles;
 internal partial class Mod: StardewModdingAPI.Mod {
     internal static Configuration Config;
     internal static IModHelper ModHelper;
+    internal static IBetterPigsApi BetterPigsApi;
 
     public override void Entry(IModHelper helper) {
         Config = helper.ReadConfig<Configuration>();
@@ -43,6 +44,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
         var configMenu = ModHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);
+        BetterPigsApi = ModHelper.ModRegistry.GetApi<IBetterPigsApi>("MindMeltMax.WinterPigs");
     }
 
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {

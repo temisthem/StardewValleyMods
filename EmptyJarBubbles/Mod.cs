@@ -10,15 +10,16 @@ using Object = StardewValley.Object;
 namespace EmptyJarBubbles;
 
 internal class Mod: StardewModdingAPI.Mod {
-    internal static Configuration Config;
-    internal static int CurrentEmoteFrame;
-    internal static int CurrentEmoteInterval;
-    internal static List<Object> Machines;
-    internal static Dictionary<string, MachineData> MachineData;
-    internal static List<string> ModdedMachineQualifiedIds;
+    private static Configuration _config;
+    private static int _currentEmoteFrame;
+    private static int _currentEmoteInterval;
+    private static List<Object> _machines;
+    private static Dictionary<string, MachineData> _machineData;
+    private static List<string> _moddedMachineQualifiedIds;
+    private static bool _toggleEmoteEnabled = true;
 
     public override void Entry(IModHelper helper) {
-        Config = Helper.ReadConfig<Configuration>();
+        _config = Helper.ReadConfig<Configuration>();
         I18n.Init(helper.Translation);
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -29,6 +30,7 @@ internal class Mod: StardewModdingAPI.Mod {
         helper.Events.World.ObjectListChanged += ObjectListChanged;
         helper.Events.Player.Warped += Warped;
         helper.Events.Display.MenuChanged += MenuChanged;
+        Helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
     }
 
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
@@ -36,32 +38,37 @@ internal class Mod: StardewModdingAPI.Mod {
         if (configMenu is not null) RegisterConfig(configMenu);
     }
     
+    private void Input_ButtonsChanged(object sender, ButtonsChangedEventArgs e) {
+        if (!_config.Enabled) return;
+        if (_config.ToggleEmoteKey.JustPressed()) _toggleEmoteEnabled = !_toggleEmoteEnabled;
+    }
+    
     private void UpdateTicked(object sender, UpdateTickedEventArgs e) {
-        if (!Config.Enabled) return;
+        if (!_config.Enabled) return;
         AnimateEmote();
     }
 
     private static void AnimateEmote() {
-        CurrentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+        _currentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
 
-        if (CurrentEmoteFrame is < 16 or > 19) CurrentEmoteFrame = 16;
-        if (CurrentEmoteInterval > Config.EmoteInterval) {
-            if (CurrentEmoteFrame < 19) CurrentEmoteFrame++;
-            else CurrentEmoteFrame = 16;
-            CurrentEmoteInterval = 0;
+        if (_currentEmoteFrame is < 16 or > 19) _currentEmoteFrame = 16;
+        if (_currentEmoteInterval > _config.EmoteInterval) {
+            if (_currentEmoteFrame < 19) _currentEmoteFrame++;
+            else _currentEmoteFrame = 16;
+            _currentEmoteInterval = 0;
         }
     }
 
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
-        MachineData = DataLoader.Machines(Game1.content);
-        ModdedMachineQualifiedIds = GetModdedMachinesFromMachineData();
+        _machineData = DataLoader.Machines(Game1.content);
+        _moddedMachineQualifiedIds = GetModdedMachinesFromMachineData();
         ApplyZoomLevel99();
     }
 
     private static List<string> GetModdedMachinesFromMachineData() {
-        return MachineData
+        return _machineData
             .Where(kvp =>
                 kvp.Value.OutputRules is not null &&
                 kvp.Value.OutputRules
@@ -91,14 +98,14 @@ internal class Mod: StardewModdingAPI.Mod {
     }
 
     private void ApplyZoomLevel99() {
-        if (!Config.Enabled) return;
-        if (!Config.ZoomLevel99Enabled) return;
+        if (!_config.Enabled) return;
+        if (!_config.ZoomLevel99Enabled) return;
 
         Game1.options.desiredBaseZoomLevel = 0.99f;
     }
 
     private void ObjectListChanged(object sender, ObjectListChangedEventArgs e) {
-        if (!Config.Enabled) return;
+        if (!_config.Enabled) return;
 
         var removedMachines = e.Removed
             .Where(kvp => IsValidMachine(kvp.Value))
@@ -108,45 +115,45 @@ internal class Mod: StardewModdingAPI.Mod {
             .Where(kvp => IsValidMachine(kvp.Value))
             .Select(kvp => kvp.Value);
         
-        Machines.RemoveAll(x => removedMachines.Contains(x));
-        Machines.AddRange(newMachines);
+        _machines.RemoveAll(x => removedMachines.Contains(x));
+        _machines.AddRange(newMachines);
     }
     
     private void BuildMachineList()
     {
-        if (!Config.Enabled) return;
+        if (!_config.Enabled) return;
         if (Game1.currentLocation is null) return;
-        if (ModdedMachineQualifiedIds is null) return;
+        if (_moddedMachineQualifiedIds is null) return;
 
-        Machines = Game1.currentLocation.Objects.Values
+        _machines = Game1.currentLocation.Objects.Values
             .Where(IsValidMachine)
             .ToList();
     }
     
     private bool IsValidMachine(Object o) {
-        return IsObjectValidMachine(o, Config.JarsEnabled, VanillaMachineQualifiedIds.Jar) ||
-               IsObjectValidMachine(o, Config.KegsEnabled, VanillaMachineQualifiedIds.Keg) ||
-               IsObjectValidMachine(o, Config.CasksEnabled, VanillaMachineQualifiedIds.Cask) ||
-               IsObjectValidMachine(o, Config.MayonnaiseMachinesEnabled, VanillaMachineQualifiedIds.MayonnaiseMachine) ||
-               IsObjectValidMachine(o, Config.CheesePressesEnabled, VanillaMachineQualifiedIds.CheesePress) ||
-               IsObjectValidMachine(o, Config.LoomsEnabled, VanillaMachineQualifiedIds.Loom) ||
-               IsObjectValidMachine(o, Config.OilMakersEnabled, VanillaMachineQualifiedIds.OilMaker) ||
-               IsObjectValidMachine(o, Config.DehydratorsEnabled, VanillaMachineQualifiedIds.Dehydrator) ||
-               IsObjectValidMachine(o, Config.FishSmokersEnabled, VanillaMachineQualifiedIds.FishSmoker) ||
-               IsObjectValidMachine(o, Config.BaitMakersEnabled, VanillaMachineQualifiedIds.BaitMaker) ||
-               IsObjectValidMachine(o, Config.BoneMillsEnabled, VanillaMachineQualifiedIds.BoneMill) ||
-               IsObjectValidMachine(o, Config.CharcoalKilnsEnabled, VanillaMachineQualifiedIds.CharcoalKiln) ||
-               IsObjectValidMachine(o, Config.CrystalariumsEnabled, VanillaMachineQualifiedIds.Crystalarium) ||
-               IsObjectValidMachine(o, Config.FurnacesEnabled, VanillaMachineQualifiedIds.Furnace) ||
-               IsObjectValidMachine(o, Config.FurnacesEnabled, VanillaMachineQualifiedIds.HeavyFurnace) ||
-               IsObjectValidMachine(o, Config.RecyclingMachinesEnabled, VanillaMachineQualifiedIds.RecyclingMachine) ||
-               IsObjectValidMachine(o, Config.SeedMakersEnabled, VanillaMachineQualifiedIds.SeedMaker) ||
-               IsObjectValidMachine(o, Config.SlimeEggPressesEnabled, VanillaMachineQualifiedIds.SlimeEggPress) ||
-               IsObjectValidMachine(o, Config.CrabPotsEnabled, VanillaMachineQualifiedIds.CrabPot) ||
-               IsObjectValidMachine(o, Config.DeconstructorsEnabled, VanillaMachineQualifiedIds.Deconstructor) ||
-               IsObjectValidMachine(o, Config.GeodeCrushersEnabled, VanillaMachineQualifiedIds.GeodeCrusher) ||
-               IsObjectValidMachine(o, Config.WoodChippersEnabled, VanillaMachineQualifiedIds.WoodChipper) ||
-               (Config.ModdedMachinesEnabled && ModdedMachineQualifiedIds.Contains(o.QualifiedItemId));
+        return IsObjectValidMachine(o, _config.JarsEnabled, VanillaMachineQualifiedIds.Jar) ||
+               IsObjectValidMachine(o, _config.KegsEnabled, VanillaMachineQualifiedIds.Keg) ||
+               IsObjectValidMachine(o, _config.CasksEnabled, VanillaMachineQualifiedIds.Cask) ||
+               IsObjectValidMachine(o, _config.MayonnaiseMachinesEnabled, VanillaMachineQualifiedIds.MayonnaiseMachine) ||
+               IsObjectValidMachine(o, _config.CheesePressesEnabled, VanillaMachineQualifiedIds.CheesePress) ||
+               IsObjectValidMachine(o, _config.LoomsEnabled, VanillaMachineQualifiedIds.Loom) ||
+               IsObjectValidMachine(o, _config.OilMakersEnabled, VanillaMachineQualifiedIds.OilMaker) ||
+               IsObjectValidMachine(o, _config.DehydratorsEnabled, VanillaMachineQualifiedIds.Dehydrator) ||
+               IsObjectValidMachine(o, _config.FishSmokersEnabled, VanillaMachineQualifiedIds.FishSmoker) ||
+               IsObjectValidMachine(o, _config.BaitMakersEnabled, VanillaMachineQualifiedIds.BaitMaker) ||
+               IsObjectValidMachine(o, _config.BoneMillsEnabled, VanillaMachineQualifiedIds.BoneMill) ||
+               IsObjectValidMachine(o, _config.CharcoalKilnsEnabled, VanillaMachineQualifiedIds.CharcoalKiln) ||
+               IsObjectValidMachine(o, _config.CrystalariumsEnabled, VanillaMachineQualifiedIds.Crystalarium) ||
+               IsObjectValidMachine(o, _config.FurnacesEnabled, VanillaMachineQualifiedIds.Furnace) ||
+               IsObjectValidMachine(o, _config.FurnacesEnabled, VanillaMachineQualifiedIds.HeavyFurnace) ||
+               IsObjectValidMachine(o, _config.RecyclingMachinesEnabled, VanillaMachineQualifiedIds.RecyclingMachine) ||
+               IsObjectValidMachine(o, _config.SeedMakersEnabled, VanillaMachineQualifiedIds.SeedMaker) ||
+               IsObjectValidMachine(o, _config.SlimeEggPressesEnabled, VanillaMachineQualifiedIds.SlimeEggPress) ||
+               IsObjectValidMachine(o, _config.CrabPotsEnabled, VanillaMachineQualifiedIds.CrabPot) ||
+               IsObjectValidMachine(o, _config.DeconstructorsEnabled, VanillaMachineQualifiedIds.Deconstructor) ||
+               IsObjectValidMachine(o, _config.GeodeCrushersEnabled, VanillaMachineQualifiedIds.GeodeCrusher) ||
+               IsObjectValidMachine(o, _config.WoodChippersEnabled, VanillaMachineQualifiedIds.WoodChipper) ||
+               (_config.ModdedMachinesEnabled && _moddedMachineQualifiedIds.Contains(o.QualifiedItemId));
     }
     
     private bool IsObjectValidMachine(Object o, bool enabled, string qualifiedId) {
@@ -155,9 +162,10 @@ internal class Mod: StardewModdingAPI.Mod {
     }
 
     private void RenderBubbles(object sender, RenderedWorldEventArgs e) {
-        if (!Config.Enabled) return;
+        if (!_config.Enabled) return;
+        if (!_toggleEmoteEnabled) return;
 
-        foreach (var machine in Machines.Where(IsMachineRenderReady))
+        foreach (var machine in _machines.Where(IsMachineRenderReady))
             DrawBubbles(machine, e.SpriteBatch);
     }
 
@@ -169,7 +177,7 @@ internal class Mod: StardewModdingAPI.Mod {
     private void DrawBubbles(Object o, SpriteBatch spriteBatch) {
         Vector2 tilePosition = o.TileLocation * 64;
         Vector2 emotePosition = Game1.GlobalToLocal(tilePosition);
-        emotePosition += new Vector2((100 - Config.SizePercent) / 100f * 32 +Config.OffsetX, -Config.OffsetY);
+        emotePosition += new Vector2((100 - _config.SizePercent) / 100f * 32 +_config.OffsetX, -_config.OffsetY);
         if (o is CrabPot pot) {
             emotePosition += pot.directionOffset.Value;
             emotePosition.Y += pot.yBob + 20;
@@ -177,11 +185,11 @@ internal class Mod: StardewModdingAPI.Mod {
         
         spriteBatch.Draw(Game1.emoteSpriteSheet,
             emotePosition, 
-            new Rectangle(CurrentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width, CurrentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16, 16, 16),
-            Color.White * (Config.OpacityPercent / 100f), 
+            new Rectangle(_currentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width, _currentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16, 16, 16),
+            Color.White * (_config.OpacityPercent / 100f), 
             0f,
             Vector2.Zero, 
-            4f * Config.SizePercent / 100f, 
+            4f * _config.SizePercent / 100f, 
             SpriteEffects.None, 
             (tilePosition.Y + 37) / 10000f);
     }
@@ -189,22 +197,22 @@ internal class Mod: StardewModdingAPI.Mod {
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
-            reset: () => Config = new Configuration(),
-            save: () => Helper.WriteConfig(Config)
+            reset: () => _config = new Configuration(),
+            save: () => Helper.WriteConfig(_config)
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.Enabled,
-            getValue: () => Config.Enabled,
-            setValue: value => Config.Enabled = value
+            getValue: () => _config.Enabled,
+            setValue: value => _config.Enabled = value
         );
         
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleYOffset,
-            getValue: () => Config.OffsetY,
-            setValue: value => Config.OffsetY = value,
+            getValue: () => _config.OffsetY,
+            setValue: value => _config.OffsetY = value,
             min: 0,
             max: 128
         );
@@ -212,8 +220,8 @@ internal class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleXOffset,
-            getValue: () => Config.OffsetX,
-            setValue: value => Config.OffsetX = value,
+            getValue: () => _config.OffsetX,
+            setValue: value => _config.OffsetX = value,
             min: -128,
             max: 128
         );
@@ -221,8 +229,8 @@ internal class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.EmoteInterval,
-            getValue: () => Config.EmoteInterval,
-            setValue: value => Config.EmoteInterval = value,
+            getValue: () => _config.EmoteInterval,
+            setValue: value => _config.EmoteInterval = value,
             min: 0,
             max: 1000
         );
@@ -230,8 +238,8 @@ internal class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.Opacity,
-            getValue: () => Config.OpacityPercent,
-            setValue: value => Config.OpacityPercent = value,
+            getValue: () => _config.OpacityPercent,
+            setValue: value => _config.OpacityPercent = value,
             min: 1,
             max: 100
         );
@@ -239,173 +247,180 @@ internal class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleSize,
-            getValue: () => Config.SizePercent,
-            setValue: value => Config.SizePercent = value,
+            getValue: () => _config.SizePercent,
+            setValue: value => _config.SizePercent = value,
             min: 1,
             max: 100
+        );
+        
+        configMenu.AddKeybindList(
+            mod: ModManifest,
+            name: I18n.ToggleBubbleKey,
+            getValue: () => _config.ToggleEmoteKey,
+            setValue: value => _config.ToggleEmoteKey = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.ZoomLevel99Enabled,
             tooltip: I18n.ZoomLevel99EnabledTooltip,
-            getValue: () => Config.ZoomLevel99Enabled,
-            setValue: value => Config.ZoomLevel99Enabled = value
+            getValue: () => _config.ZoomLevel99Enabled,
+            setValue: value => _config.ZoomLevel99Enabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.ModdedMachinesEnabled,
             tooltip: I18n.ModdedMachinesEnabledTooltip,
-            getValue: () => Config.ModdedMachinesEnabled,
-            setValue: value => Config.ModdedMachinesEnabled = value
+            getValue: () => _config.ModdedMachinesEnabled,
+            setValue: value => _config.ModdedMachinesEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.JarsEnabled, 
-            getValue: () => Config.JarsEnabled,
-            setValue: value => Config.JarsEnabled = value
+            getValue: () => _config.JarsEnabled,
+            setValue: value => _config.JarsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.KegsEnabled, 
-            getValue: () => Config.KegsEnabled,
-            setValue: value => Config.KegsEnabled = value
+            getValue: () => _config.KegsEnabled,
+            setValue: value => _config.KegsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.CasksEnabled, 
-            getValue: () => Config.CasksEnabled,
-            setValue: value => Config.CasksEnabled = value
+            getValue: () => _config.CasksEnabled,
+            setValue: value => _config.CasksEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.MayonnaiseMachinesEnabled, 
-            getValue: () => Config.MayonnaiseMachinesEnabled,
-            setValue: value => Config.MayonnaiseMachinesEnabled = value
+            getValue: () => _config.MayonnaiseMachinesEnabled,
+            setValue: value => _config.MayonnaiseMachinesEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.CheesePressesEnabled, 
-            getValue: () => Config.CheesePressesEnabled,
-            setValue: value => Config.CheesePressesEnabled = value
+            getValue: () => _config.CheesePressesEnabled,
+            setValue: value => _config.CheesePressesEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.LoomsEnabled, 
-            getValue: () => Config.LoomsEnabled,
-            setValue: value => Config.LoomsEnabled = value
+            getValue: () => _config.LoomsEnabled,
+            setValue: value => _config.LoomsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.OilMakersEnabled, 
-            getValue: () => Config.OilMakersEnabled,
-            setValue: value => Config.OilMakersEnabled = value
+            getValue: () => _config.OilMakersEnabled,
+            setValue: value => _config.OilMakersEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DehydratorsEnabled, 
-            getValue: () => Config.DehydratorsEnabled,
-            setValue: value => Config.DehydratorsEnabled = value
+            getValue: () => _config.DehydratorsEnabled,
+            setValue: value => _config.DehydratorsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.FishSmokersEnabled, 
-            getValue: () => Config.FishSmokersEnabled,
-            setValue: value => Config.FishSmokersEnabled = value
+            getValue: () => _config.FishSmokersEnabled,
+            setValue: value => _config.FishSmokersEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.BaitMakersEnabled, 
-            getValue: () => Config.BaitMakersEnabled,
-            setValue: value => Config.BaitMakersEnabled = value
+            getValue: () => _config.BaitMakersEnabled,
+            setValue: value => _config.BaitMakersEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.BoneMillsEnabled, 
-            getValue: () => Config.BoneMillsEnabled,
-            setValue: value => Config.BoneMillsEnabled = value
+            getValue: () => _config.BoneMillsEnabled,
+            setValue: value => _config.BoneMillsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.CharcoalKilnsEnabled, 
-            getValue: () => Config.CharcoalKilnsEnabled,
-            setValue: value => Config.CharcoalKilnsEnabled = value
+            getValue: () => _config.CharcoalKilnsEnabled,
+            setValue: value => _config.CharcoalKilnsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.CrystalariumsEnabled, 
-            getValue: () => Config.CrystalariumsEnabled,
-            setValue: value => Config.CrystalariumsEnabled = value
+            getValue: () => _config.CrystalariumsEnabled,
+            setValue: value => _config.CrystalariumsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.FurnacesEnabled, 
-            getValue: () => Config.FurnacesEnabled,
-            setValue: value => Config.FurnacesEnabled = value
+            getValue: () => _config.FurnacesEnabled,
+            setValue: value => _config.FurnacesEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.RecyclingMachinesEnabled, 
-            getValue: () => Config.RecyclingMachinesEnabled,
-            setValue: value => Config.RecyclingMachinesEnabled = value
+            getValue: () => _config.RecyclingMachinesEnabled,
+            setValue: value => _config.RecyclingMachinesEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.SeedMakersEnabled, 
-            getValue: () => Config.SeedMakersEnabled,
-            setValue: value => Config.SeedMakersEnabled = value
+            getValue: () => _config.SeedMakersEnabled,
+            setValue: value => _config.SeedMakersEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.SlimeEggPressesEnabled, 
-            getValue: () => Config.SlimeEggPressesEnabled,
-            setValue: value => Config.SlimeEggPressesEnabled = value
+            getValue: () => _config.SlimeEggPressesEnabled,
+            setValue: value => _config.SlimeEggPressesEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.CrabPotsEnabled, 
-            getValue: () => Config.CrabPotsEnabled,
-            setValue: value => Config.CrabPotsEnabled = value
+            getValue: () => _config.CrabPotsEnabled,
+            setValue: value => _config.CrabPotsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DeconstructorsEnabled, 
-            getValue: () => Config.DeconstructorsEnabled,
-            setValue: value => Config.DeconstructorsEnabled = value
+            getValue: () => _config.DeconstructorsEnabled,
+            setValue: value => _config.DeconstructorsEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.GeodeCrushersEnabled, 
-            getValue: () => Config.GeodeCrushersEnabled,
-            setValue: value => Config.GeodeCrushersEnabled = value
+            getValue: () => _config.GeodeCrushersEnabled,
+            setValue: value => _config.GeodeCrushersEnabled = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.WoodChippersEnabled, 
-            getValue: () => Config.WoodChippersEnabled,
-            setValue: value => Config.WoodChippersEnabled = value
+            getValue: () => _config.WoodChippersEnabled,
+            setValue: value => _config.WoodChippersEnabled = value
         );
     }
 }

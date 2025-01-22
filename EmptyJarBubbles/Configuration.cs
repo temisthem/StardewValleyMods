@@ -1,3 +1,6 @@
+using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
+
 namespace EmptyJarBubbles; 
 
 internal class Configuration {
@@ -29,5 +32,6 @@ internal class Configuration {
     public int EmoteInterval { get; set; } = 250;
     public int OpacityPercent { get; set; } = 75;
     public int SizePercent { get; set; } = 75;
+    public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
     public bool ZoomLevel99Enabled { get; set; } = false;
 }

@@ -7,6 +7,7 @@
   "emote-interval": "Emote Interval (ms)",
   "opacity": "Opacity",
   "bubble-size": "Bubble Size",
+  "toggle-bubble-key": "Toggle Bubble Key",
   "zoom-level-99-enabled": "Set Zoom Level to 99",
   "zoom-level-99-enabled-tooltip": "Fixes the zoom level to 99 instead of 100 to prevent UI scaling bugs",
   

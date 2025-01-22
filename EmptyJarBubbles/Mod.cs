@@ -67,8 +67,8 @@ internal class Mod: StardewModdingAPI.Mod {
         ApplyZoomLevel99();
     }
 
-    private static List<string> GetModdedMachinesFromMachineData() {
-        return _machineData
+    private static List<string> GetModdedMachinesFromMachineData()
+        => _machineData
             .Where(kvp =>
                 kvp.Value.OutputRules is not null &&
                 kvp.Value.OutputRules
@@ -77,7 +77,6 @@ internal class Mod: StardewModdingAPI.Mod {
             .Select(kvp => kvp.Key)
             .Where(x => !VanillaMachineQualifiedIds.AsList().Contains(x))
             .ToList();
-    }
 
     private void ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
     {
@@ -108,14 +107,14 @@ internal class Mod: StardewModdingAPI.Mod {
         if (!_config.Enabled) return;
 
         var removedMachines = e.Removed
-            .Where(kvp => IsValidMachine(kvp.Value))
-            .Select(kvp => kvp.Value);
-
-        var newMachines = e.Added
-            .Where(kvp => IsValidMachine(kvp.Value))
-            .Select(kvp => kvp.Value);
+            .Select(kvp => kvp.Value)
+            .Where(IsValidMachine);
         
-        _machines.RemoveAll(x => removedMachines.Contains(x));
+        var newMachines = e.Added
+            .Select(kvp => kvp.Value)
+            .Where(IsValidMachine);
+        
+        _machines.RemoveAll(removedMachines.Contains);
         _machines.AddRange(newMachines);
     }
     
@@ -128,6 +127,43 @@ internal class Mod: StardewModdingAPI.Mod {
         _machines = Game1.currentLocation.Objects.Values
             .Where(IsValidMachine)
             .ToList();
+    }
+    
+    
+    private bool IsValidMachine2(Object o)
+        => GetValidMachineIds().Contains(o.QualifiedItemId);
+
+    private IEnumerable<string> GetValidMachineIds()
+    {
+        var list = new List<string>();
+        
+        if (_config.JarsEnabled) list.Add(VanillaMachineQualifiedIds.Jar);
+        if (_config.KegsEnabled) list.Add(VanillaMachineQualifiedIds.Keg);
+        if (_config.CasksEnabled) list.Add(VanillaMachineQualifiedIds.Cask);
+        if (_config.MayonnaiseMachinesEnabled) list.Add(VanillaMachineQualifiedIds.MayonnaiseMachine);
+        if (_config.CheesePressesEnabled) list.Add(VanillaMachineQualifiedIds.CheesePress);
+        if (_config.LoomsEnabled) list.Add(VanillaMachineQualifiedIds.Loom);
+        if (_config.OilMakersEnabled) list.Add(VanillaMachineQualifiedIds.OilMaker);
+        if (_config.DehydratorsEnabled) list.Add(VanillaMachineQualifiedIds.Dehydrator);
+        if (_config.FishSmokersEnabled) list.Add(VanillaMachineQualifiedIds.FishSmoker);
+        if (_config.BaitMakersEnabled) list.Add(VanillaMachineQualifiedIds.BaitMaker);
+        if (_config.BoneMillsEnabled) list.Add(VanillaMachineQualifiedIds.BoneMill);
+        if (_config.CharcoalKilnsEnabled) list.Add(VanillaMachineQualifiedIds.CharcoalKiln);
+        if (_config.CrystalariumsEnabled) list.Add(VanillaMachineQualifiedIds.Crystalarium);
+        if (_config.FurnacesEnabled)
+        {
+            list.Add(VanillaMachineQualifiedIds.Furnace);
+            list.Add(VanillaMachineQualifiedIds.HeavyFurnace);
+        }
+        if (_config.RecyclingMachinesEnabled) list.Add(VanillaMachineQualifiedIds.RecyclingMachine);
+        if (_config.SeedMakersEnabled) list.Add(VanillaMachineQualifiedIds.SeedMaker);
+        if (_config.SlimeEggPressesEnabled) list.Add(VanillaMachineQualifiedIds.SlimeEggPress);
+        if (_config.CrabPotsEnabled) list.Add(VanillaMachineQualifiedIds.CrabPot);
+        if (_config.DeconstructorsEnabled) list.Add(VanillaMachineQualifiedIds.Deconstructor);
+        if (_config.GeodeCrushersEnabled) list.Add(VanillaMachineQualifiedIds.GeodeCrusher);
+        if (_config.WoodChippersEnabled) list.Add(VanillaMachineQualifiedIds.WoodChipper);
+        if (_config.ModdedMachinesEnabled) list.AddRange(_moddedMachineQualifiedIds);
+        return list;
     }
     
     private bool IsValidMachine(Object o) {
@@ -169,9 +205,12 @@ internal class Mod: StardewModdingAPI.Mod {
             DrawBubbles(machine, e.SpriteBatch);
     }
 
-    private bool IsMachineRenderReady(Object o) {
-        return (o is not CrabPot && o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value) ||
-               (o is CrabPot pot && pot.bait.Value is null && pot.heldObject.Value is null);
+    private bool IsMachineRenderReady(Object o)
+    {
+        if (o is CrabPot pot)
+            return pot.bait.Value is null && pot.heldObject.Value is null;
+
+        return o.MinutesUntilReady <= 0 && !o.readyForHarvest.Value;
     }
     
     private void DrawBubbles(Object o, SpriteBatch spriteBatch) {

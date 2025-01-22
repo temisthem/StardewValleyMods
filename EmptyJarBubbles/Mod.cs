@@ -15,8 +15,8 @@ internal class Mod : StardewModdingAPI.Mod
     private static int _currentEmoteFrame;
     private static int _currentEmoteInterval;
     private static List<Object> _machines;
-    private static Dictionary<string, MachineData> _machineData;
     private static List<string> _moddedMachineQualifiedIds;
+    private static List<string> _validMachineIds;
     private static bool _toggleEmoteEnabled = true;
 
     public override void Entry(IModHelper helper)
@@ -69,13 +69,16 @@ internal class Mod : StardewModdingAPI.Mod
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         Helper.Events.Display.RenderedWorld += RenderBubbles;
-        _machineData = DataLoader.Machines(Game1.content);
-        _moddedMachineQualifiedIds = GetModdedMachinesFromMachineData();
+        
+        var machineData = DataLoader.Machines(Game1.content);
+        _moddedMachineQualifiedIds = GetModdedMachinesFromMachineData(machineData);
+        
+        _validMachineIds = GetBubbleEnabledMachineIds();
         ApplyZoomLevel99();
     }
 
-    private static List<string> GetModdedMachinesFromMachineData()
-        => _machineData
+    private static List<string> GetModdedMachinesFromMachineData(Dictionary<string, MachineData> machineData)
+        => machineData
             .Where(kvp =>
                 kvp.Value.OutputRules is not null &&
                 kvp.Value.OutputRules
@@ -92,17 +95,18 @@ internal class Mod : StardewModdingAPI.Mod
 
     private void Warped(object sender, WarpedEventArgs e)
     {
-        BuildMachineList();
+        _machines = GetMachinesInCurrentLocation();
     }
 
     private void DayStarted(object sender, DayStartedEventArgs e)
     {
-        BuildMachineList();
+        _machines = GetMachinesInCurrentLocation();
     }
 
     private void MenuChanged(object sender, MenuChangedEventArgs e)
     {
-        BuildMachineList();
+        _validMachineIds = GetBubbleEnabledMachineIds();
+        _machines = GetMachinesInCurrentLocation();
         ApplyZoomLevel99();
     }
 
@@ -130,24 +134,24 @@ internal class Mod : StardewModdingAPI.Mod
         _machines.AddRange(newMachines);
     }
 
-    private void BuildMachineList()
+    private List<Object> GetMachinesInCurrentLocation()
     {
-        if (!_config.Enabled) return;
-        if (Game1.currentLocation is null) return;
-        if (_moddedMachineQualifiedIds is null) return;
+        if (!_config.Enabled) return new List<Object>();
+        if (Game1.currentLocation is null) return new List<Object>();
 
-        _machines = Game1.currentLocation.Objects.Values
+        return Game1.currentLocation.Objects.Values
             .Where(IsValidMachine)
             .ToList();
     }
+    
+    private bool IsValidMachine(Object o)
+        => _validMachineIds.Contains(o.QualifiedItemId);
 
-
-    private bool IsValidMachine2(Object o)
-        => GetValidMachineIds().Contains(o.QualifiedItemId);
-
-    private IEnumerable<string> GetValidMachineIds()
+    private List<string> GetBubbleEnabledMachineIds()
     {
         var list = new List<string>();
+
+        if (!_config.Enabled) return list;
 
         if (_config.JarsEnabled) list.Add(VanillaMachineQualifiedIds.Jar);
         if (_config.KegsEnabled) list.Add(VanillaMachineQualifiedIds.Keg);
@@ -176,43 +180,10 @@ internal class Mod : StardewModdingAPI.Mod
         if (_config.GeodeCrushersEnabled) list.Add(VanillaMachineQualifiedIds.GeodeCrusher);
         if (_config.WoodChippersEnabled) list.Add(VanillaMachineQualifiedIds.WoodChipper);
         if (_config.ModdedMachinesEnabled) list.AddRange(_moddedMachineQualifiedIds);
+
         return list;
     }
-
-    private bool IsValidMachine(Object o)
-    {
-        return IsObjectValidMachine(o, _config.JarsEnabled, VanillaMachineQualifiedIds.Jar) ||
-               IsObjectValidMachine(o, _config.KegsEnabled, VanillaMachineQualifiedIds.Keg) ||
-               IsObjectValidMachine(o, _config.CasksEnabled, VanillaMachineQualifiedIds.Cask) ||
-               IsObjectValidMachine(o, _config.MayonnaiseMachinesEnabled,
-                   VanillaMachineQualifiedIds.MayonnaiseMachine) ||
-               IsObjectValidMachine(o, _config.CheesePressesEnabled, VanillaMachineQualifiedIds.CheesePress) ||
-               IsObjectValidMachine(o, _config.LoomsEnabled, VanillaMachineQualifiedIds.Loom) ||
-               IsObjectValidMachine(o, _config.OilMakersEnabled, VanillaMachineQualifiedIds.OilMaker) ||
-               IsObjectValidMachine(o, _config.DehydratorsEnabled, VanillaMachineQualifiedIds.Dehydrator) ||
-               IsObjectValidMachine(o, _config.FishSmokersEnabled, VanillaMachineQualifiedIds.FishSmoker) ||
-               IsObjectValidMachine(o, _config.BaitMakersEnabled, VanillaMachineQualifiedIds.BaitMaker) ||
-               IsObjectValidMachine(o, _config.BoneMillsEnabled, VanillaMachineQualifiedIds.BoneMill) ||
-               IsObjectValidMachine(o, _config.CharcoalKilnsEnabled, VanillaMachineQualifiedIds.CharcoalKiln) ||
-               IsObjectValidMachine(o, _config.CrystalariumsEnabled, VanillaMachineQualifiedIds.Crystalarium) ||
-               IsObjectValidMachine(o, _config.FurnacesEnabled, VanillaMachineQualifiedIds.Furnace) ||
-               IsObjectValidMachine(o, _config.FurnacesEnabled, VanillaMachineQualifiedIds.HeavyFurnace) ||
-               IsObjectValidMachine(o, _config.RecyclingMachinesEnabled, VanillaMachineQualifiedIds.RecyclingMachine) ||
-               IsObjectValidMachine(o, _config.SeedMakersEnabled, VanillaMachineQualifiedIds.SeedMaker) ||
-               IsObjectValidMachine(o, _config.SlimeEggPressesEnabled, VanillaMachineQualifiedIds.SlimeEggPress) ||
-               IsObjectValidMachine(o, _config.CrabPotsEnabled, VanillaMachineQualifiedIds.CrabPot) ||
-               IsObjectValidMachine(o, _config.DeconstructorsEnabled, VanillaMachineQualifiedIds.Deconstructor) ||
-               IsObjectValidMachine(o, _config.GeodeCrushersEnabled, VanillaMachineQualifiedIds.GeodeCrusher) ||
-               IsObjectValidMachine(o, _config.WoodChippersEnabled, VanillaMachineQualifiedIds.WoodChipper) ||
-               (_config.ModdedMachinesEnabled && _moddedMachineQualifiedIds.Contains(o.QualifiedItemId));
-    }
-
-    private bool IsObjectValidMachine(Object o, bool enabled, string qualifiedId)
-    {
-        if (!enabled) return false;
-        return o.QualifiedItemId == qualifiedId;
-    }
-
+    
     private void RenderBubbles(object sender, RenderedWorldEventArgs e)
     {
         if (!_config.Enabled) return;

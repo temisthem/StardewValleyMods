@@ -49,28 +49,42 @@ internal partial class Mod {
     }
 
     private static void DrawFertilizerBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
-        if (__instance.HasFertilizer()) return;
-        if (_config.HideWhenNoCrop && __instance.crop is null) return;
+        if (__instance.HasFertilizer()) 
+            return;
+        if (_config.HideWhenNoCrop && __instance.crop is null) 
+            return;
 
         var currentItem = Game1.player.CurrentItem;
 
-        if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) return;
-        if (IsTileObstructed(__instance.Tile)) return;
-        if (_config.HideWhenUnusable && currentItem is not null &&
-            !__instance.CanApplyFertilizer(currentItem.QualifiedItemId)) return;
-        if (!_config.DisplayWhenHeld && !_toggleEmoteEnabled) return;
-        if (IsItemSeed(currentItem)) return;
-
+        if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) 
+            return;
+        if (IsTileObstructed(__instance.Tile)) 
+            return;
+        if (_config.HideWhenUnusable) {
+            if (currentItem is not null && !__instance.CanApplyFertilizer(currentItem.QualifiedItemId)) 
+                return;
+            if (__instance.crop?.indexOfHarvest.Value == "771") //Ignore fiber plants
+                return;
+        }
+        if (!_config.DisplayWhenHeld && !_toggleEmoteEnabled) 
+            return;
+        if (IsItemSeed(currentItem)) 
+            return;
+        
         DrawBubble(__instance, spriteBatch);
     }
 
     private static void DrawSeedBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
         var currentItem = Game1.player.CurrentItem;
 
-        if (__instance.crop is not null) return;
-        if (IsTileObstructed(__instance.Tile)) return;
-        if (currentItem is not null && !__instance.canPlantThisSeedHere(currentItem.ItemId)) return;
-        if (!IsItemSeed(currentItem)) return;
+        if (__instance.crop is not null) 
+            return;
+        if (IsTileObstructed(__instance.Tile)) 
+            return;
+        if (currentItem is not null && !__instance.canPlantThisSeedHere(currentItem.ItemId)) 
+            return;
+        if (!IsItemSeed(currentItem)) 
+            return;
 
         DrawBubble(__instance, spriteBatch);
     }

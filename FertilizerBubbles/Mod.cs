@@ -85,13 +85,6 @@ internal partial class Mod: StardewModdingAPI.Mod {
             setValue: value => _config.Enabled = value
         );
         
-        configMenu.AddNumberOption(
-            mod: ModManifest,
-            name: I18n.Enabled,
-            getValue: () => _config.debugOffset,
-            setValue: value => _config.debugOffset = value
-        );
-        
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DisplayBubbleForFertilizers,

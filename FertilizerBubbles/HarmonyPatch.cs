@@ -13,11 +13,11 @@ internal partial class Mod {
             if (!_config.Enabled) return;
 
             if (_config.DisplayBubbleForFertilizers) {
-                DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch, _config.debugOffset);
+                DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch);
             }
 
             if (_config.DisplayBubbleForSeeds) {
-                DrawSeedBubble(__instance.hoeDirt.Get(), spriteBatch, _config.debugOffset);
+                DrawSeedBubble(__instance.hoeDirt.Get(), spriteBatch);
             }
         }
     }
@@ -48,7 +48,7 @@ internal partial class Mod {
         return obj.Type == "Seeds";
     }
 
-    private static void DrawFertilizerBubble(HoeDirt __instance, SpriteBatch spriteBatch, float yOffset = 0f) {
+    private static void DrawFertilizerBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
         if (__instance.HasFertilizer()) return;
         if (_config.HideWhenNoCrop && __instance.crop is null) return;
 
@@ -64,7 +64,7 @@ internal partial class Mod {
         DrawBubble(__instance, spriteBatch);
     }
 
-    private static void DrawSeedBubble(HoeDirt __instance, SpriteBatch spriteBatch, float yOffset = 0f) {
+    private static void DrawSeedBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
         var currentItem = Game1.player.CurrentItem;
 
         if (__instance.crop is not null) return;
@@ -92,7 +92,7 @@ internal partial class Mod {
             Vector2.Zero,
             4f * _config.SizePercent / 100f,
             SpriteEffects.None,
-            (tilePosition.Y * 64 + 37 + yOffset) / 10000f);
+            1f);
     }
 
     private static Vector2 GetEmotePosition(HoeDirt __instance, out Vector2 emotePosition) {

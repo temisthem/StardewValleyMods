@@ -5,8 +5,6 @@ namespace FertilizerBubbles;
 
 internal class Configuration {
     public bool Enabled { get; set; } = true;
-
-    public int debugOffset { get; set; } = 0;
     public bool DisplayBubbleForFertilizers { get; set; } = true;
     public bool DisplayBubbleForSeeds { get; set; } = false;
     public bool DisplayWhenHeld { get; set; } = true;

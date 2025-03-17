@@ -11,12 +11,16 @@ internal partial class Mod {
     public class IndoorPot_draw_Patch {
         public static void Postfix(IndoorPot __instance, SpriteBatch spriteBatch) {
             if (!_config.Enabled) return;
-
+            
             if (_config.DisplayBubbleForFertilizers) {
+                if (_config.HideWhenUnusable && __instance.bush.Value is not null) 
+                    return;
                 DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch);
             }
 
             if (_config.DisplayBubbleForSeeds) {
+                if (__instance.bush.Value is not null) 
+                    return;
                 DrawSeedBubble(__instance.hoeDirt.Get(), spriteBatch);
             }
         }

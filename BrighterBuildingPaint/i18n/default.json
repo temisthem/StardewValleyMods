@@ -2,5 +2,8 @@
   "enabled": "Enabled",
   "max-brightness": "Maximum Brightness",
   "min-brightness": "Minimum Brightness",
-  "max-saturation": "Maximum Saturation"
+  "max-saturation": "Maximum Saturation",
+  "hue": "Hue",
+  "saturation": "Saturation",
+  "lightness": "Lightness"
 }

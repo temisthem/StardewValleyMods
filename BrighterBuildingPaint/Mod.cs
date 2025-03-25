@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley.Menus;
@@ -29,6 +30,14 @@ internal partial class Mod: StardewModdingAPI.Mod {
                 typeof(Action<int>)}),
             postfix: new HarmonyMethod(typeof(BuildingPaintMenu_BuildingColorSlider_Patch),
                 nameof(BuildingPaintMenu_BuildingColorSlider_Patch.Postfix))
+        );
+        
+        harmony.Patch(
+            original: AccessTools.Method(typeof(BuildingPaintMenu.ColorSliderPanel), nameof(BuildingPaintMenu.ColorSliderPanel.Draw), new [] {
+                typeof(SpriteBatch)
+            }),
+            prefix: new HarmonyMethod(typeof(BuildingPaintMenu_Draw_Patch), 
+                nameof(BuildingPaintMenu_Draw_Patch.Postfix))
         );
     }
     

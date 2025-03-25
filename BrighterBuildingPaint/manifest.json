@@ -1,7 +1,7 @@
 {
   "Name": "Brighter Building Paint",
   "Author": "tem696969696969",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "Description": "Robin finally bought some brighter paint.",
   "UniqueID": "tem696969696969.BrighterBuildingPaint",
   "EntryDll": "BrighterBuildingPaint.dll",

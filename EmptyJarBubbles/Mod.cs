@@ -4,6 +4,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData.Machines;
+using StardewValley.Locations;
 using StardewValley.Objects;
 using Object = StardewValley.Object;
 
@@ -151,6 +152,7 @@ internal class Mod: StardewModdingAPI.Mod {
     
     private bool IsObjectValidMachine(Object o, bool enabled, string qualifiedId) {
         if (!enabled) return false;
+        if (qualifiedId == VanillaMachineQualifiedIds.Cask && o.Location is not Cellar) return false;
         return o.QualifiedItemId == qualifiedId;
     }
 

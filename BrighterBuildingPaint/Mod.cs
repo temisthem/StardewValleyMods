@@ -36,8 +36,18 @@ internal partial class Mod: StardewModdingAPI.Mod {
             original: AccessTools.Method(typeof(BuildingPaintMenu.ColorSliderPanel), nameof(BuildingPaintMenu.ColorSliderPanel.Draw), new [] {
                 typeof(SpriteBatch)
             }),
-            prefix: new HarmonyMethod(typeof(BuildingPaintMenu_Draw_Patch), 
+            postfix: new HarmonyMethod(typeof(BuildingPaintMenu_Draw_Patch),
                 nameof(BuildingPaintMenu_Draw_Patch.Postfix))
+        );
+
+        harmony.Patch(
+            original: AccessTools.Method(typeof(BuildingPaintMenu.ColorSliderPanel), nameof(BuildingPaintMenu.ColorSliderPanel.ReceiveLeftClick), new [] {
+                typeof(int),
+                typeof(int),
+                typeof(bool)
+            }),
+            postfix: new HarmonyMethod(typeof(BuildingPaintMenu_ReceiveLeftClick_Patch),
+                nameof(BuildingPaintMenu_ReceiveLeftClick_Patch.Postfix))
         );
     }
     

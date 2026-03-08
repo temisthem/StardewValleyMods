@@ -11,14 +11,14 @@ internal partial class Mod {
     public class Horse_draw_Patch {
         [HarmonyAfter("Goldenrevolver.HorseOverhaul")]
         public static void Postfix(Horse __instance, SpriteBatch b) {
-            if (!Config.Enabled) return;
+            if (!_config.Enabled) return;
             if (__instance.rider != null) return;
-            if (Config.OnlyMyHorse && __instance.getOwner() != Game1.player) return; 
-            if (!Config.AlwaysRender && !EmoteEnabled) return;
+            if (_config.OnlyMyHorse && __instance.getOwner() != Game1.player) return; 
+            if (!_config.AlwaysRender && !_emoteEnabled) return;
 
-            float offsetX = Config.OffsetX + (__instance.GetSpriteWidthForPositioning() == 16 ? 0f : 32f);
-            float offsetY = Config.OffsetY - 96f;
-            Vector2 localPosition = __instance.getLocalPosition(Game1.viewport) + new Vector2(offsetX, offsetY);
+            var offsetX = _config.OffsetX + (__instance.GetSpriteWidthForPositioning() == 16 ? 0f : 32f);
+            var offsetY = _config.OffsetY - 96f;
+            var localPosition = __instance.getLocalPosition(Game1.viewport) + new Vector2(offsetX, offsetY);
             
             float num = __instance.StandingPixel.Y + 1;
 
@@ -42,16 +42,16 @@ internal partial class Mod {
 
             b.Draw(Game1.emoteSpriteSheet,
                 localPosition,
-                new Rectangle(CurrentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width,
-                    CurrentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16, 
+                new Rectangle(_currentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width,
+                    _currentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16, 
                     16, 
                     16), 
-                Color.White  * (Config.OpacityPercent / 100f), 
+                Color.White  * (_config.OpacityPercent / 100f), 
                 0.0f, 
                 Vector2.Zero,
-                4f * Config.SizePercent / 100f, 
+                4f * _config.SizePercent / 100f, 
                 SpriteEffects.None, 
-                Config.RenderOnTop ? 0.99f : num / 10000f);
+                _config.RenderOnTop ? 0.99f : num / 10000f);
         }
     }
 }

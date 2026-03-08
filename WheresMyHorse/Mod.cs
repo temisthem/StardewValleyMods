@@ -8,22 +8,22 @@ using StardewValley.Characters;
 namespace WheresMyHorse;
 
 internal partial class Mod: StardewModdingAPI.Mod {
-    internal static Configuration Config;
-    internal static IModHelper ModHelper;
-    internal static bool EmoteEnabled;
-    internal static int CurrentEmoteInterval;
-    internal static int CurrentEmoteFrame;
+    private static Configuration _config;
+    private static IModHelper _modHelper;
+    private static bool _emoteEnabled;
+    private static int _currentEmoteInterval;
+    private static int _currentEmoteFrame;
 
     public override void Entry(IModHelper helper) {
-        Config = helper.ReadConfig<Configuration>();
-        ModHelper = helper;
+        _config = helper.ReadConfig<Configuration>();
+        _modHelper = helper;
         I18n.Init(helper.Translation);
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         helper.Events.GameLoop.SaveLoaded += SaveLoaded;
         helper.Events.GameLoop.UpdateTicked += UpdateTicked;
         helper.Events.Player.Warped += Warped;
-        helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
+        helper.Events.Input.ButtonsChanged += InputButtonsChanged;
         ApplyHarmonyPatches();
     }
 
@@ -37,47 +37,47 @@ internal partial class Mod: StardewModdingAPI.Mod {
     }
 
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
-        var configMenu = ModHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+        var configMenu = _modHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);
     }
     
-    private void Warped(object sender, WarpedEventArgs e) {
-        if (Config.DisableOnMapChange) EmoteEnabled = false;
+    private static void Warped(object sender, WarpedEventArgs e) {
+        if (_config.DisableOnMapChange) _emoteEnabled = false;
     }
     
-    private void SaveLoaded(object sender, SaveLoadedEventArgs e) {
-        EmoteEnabled = false;
+    private static void SaveLoaded(object sender, SaveLoadedEventArgs e) {
+        _emoteEnabled = false;
     }
     
-    private void UpdateTicked(object sender, UpdateTickedEventArgs e) {
-        if (!Config.Enabled) return;
-        if (Config.DisableOnMount && Game1.player.isAnimatingMount) EmoteEnabled = false;
+    private static void UpdateTicked(object sender, UpdateTickedEventArgs e) {
+        if (!_config.Enabled) return;
+        if (_config.DisableOnMount && Game1.player.isAnimatingMount) _emoteEnabled = false;
         AnimateEmote();
     }
 
     private static void AnimateEmote() {
-        CurrentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+        _currentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
 
-        if (CurrentEmoteFrame is < 40 or > 43) CurrentEmoteFrame = 40;
-        if (CurrentEmoteInterval > Config.EmoteInterval) {
-            if (CurrentEmoteFrame < 43) CurrentEmoteFrame++;
-            else CurrentEmoteFrame = 40;
-            CurrentEmoteInterval = 0;
+        if (_currentEmoteFrame is < 40 or > 43) _currentEmoteFrame = 40;
+        if (_currentEmoteInterval > _config.EmoteInterval) {
+            if (_currentEmoteFrame < 43) _currentEmoteFrame++;
+            else _currentEmoteFrame = 40;
+            _currentEmoteInterval = 0;
         }
     }
     
-    private void Input_ButtonsChanged(object sender, ButtonsChangedEventArgs e) {
-        if (!Config.Enabled) return;
+    private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
+        if (!_config.Enabled) return;
         if (Game1.player.isRidingHorse()) return;
-        if (!Config.DoEmoteKey.JustPressed()) return;
+        if (!_config.DoEmoteKey.JustPressed()) return;
         
-        if (IsHorseInLocation()) EmoteEnabled = !EmoteEnabled;
+        if (IsHorseInLocation()) _emoteEnabled = !_emoteEnabled;
         else Game1.player.doEmote(8);
     }
 
     private static bool IsHorseInLocation() {
         var horses = Game1.player.currentLocation.characters.OfType<Horse>().ToList();
-        return Config.OnlyMyHorse ?
+        return _config.OnlyMyHorse ?
             horses.Any(horse => horse.getOwner() == Game1.player) :
             horses.Any();
     }
@@ -85,64 +85,64 @@ internal partial class Mod: StardewModdingAPI.Mod {
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
-            reset: () => Config = new Configuration(),
-            save: () => ModHelper.WriteConfig(Config)
+            reset: () => _config = new Configuration(),
+            save: () => _modHelper.WriteConfig(_config)
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.Enabled,
-            getValue: () => Config.Enabled,
-            setValue: value => Config.Enabled = value
+            getValue: () => _config.Enabled,
+            setValue: value => _config.Enabled = value
         );
 
         configMenu.AddKeybindList(
             mod: ModManifest,
             name: I18n.DoEmoteKey,
-            getValue: () => Config.DoEmoteKey,
-            setValue: value => Config.DoEmoteKey = value
+            getValue: () => _config.DoEmoteKey,
+            setValue: value => _config.DoEmoteKey = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.RenderOnTop,
-            getValue: () => Config.RenderOnTop,
-            setValue: value => Config.RenderOnTop = value
+            getValue: () => _config.RenderOnTop,
+            setValue: value => _config.RenderOnTop = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DisableOnMount,
-            getValue: () => Config.DisableOnMount,
-            setValue: value => Config.DisableOnMount = value
+            getValue: () => _config.DisableOnMount,
+            setValue: value => _config.DisableOnMount = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.DisableOnMapChange,
-            getValue: () => Config.DisableOnMapChange,
-            setValue: value => Config.DisableOnMapChange = value
+            getValue: () => _config.DisableOnMapChange,
+            setValue: value => _config.DisableOnMapChange = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.OnlyMyHorse,
-            getValue: () => Config.OnlyMyHorse,
-            setValue: value => Config.OnlyMyHorse = value
+            getValue: () => _config.OnlyMyHorse,
+            setValue: value => _config.OnlyMyHorse = value
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.AlwaysRender,
-            getValue: () => Config.AlwaysRender,
-            setValue: value => Config.AlwaysRender = value
+            getValue: () => _config.AlwaysRender,
+            setValue: value => _config.AlwaysRender = value
         );
 
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.EmoteInterval,
-            getValue: () => Config.EmoteInterval,
-            setValue: value => Config.EmoteInterval = value,
+            getValue: () => _config.EmoteInterval,
+            setValue: value => _config.EmoteInterval = value,
             min: 0,
             max: 1000
         );
@@ -150,8 +150,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.Opacity,
-            getValue: () => Config.OpacityPercent,
-            setValue: value => Config.OpacityPercent = value,
+            getValue: () => _config.OpacityPercent,
+            setValue: value => _config.OpacityPercent = value,
             min: 1,
             max: 100
         );
@@ -159,8 +159,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleSize,
-            getValue: () => Config.SizePercent,
-            setValue: value => Config.SizePercent = value,
+            getValue: () => _config.SizePercent,
+            setValue: value => _config.SizePercent = value,
             min: 1,
             max: 200
         );
@@ -168,8 +168,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleYOffset,
-            getValue: () => Config.OffsetY,
-            setValue: value => Config.OffsetY = value,
+            getValue: () => _config.OffsetY,
+            setValue: value => _config.OffsetY = value,
             min: -128,
             max: 128
         );
@@ -177,8 +177,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleXOffset,
-            getValue: () => Config.OffsetX,
-            setValue: value => Config.OffsetX = value,
+            getValue: () => _config.OffsetX,
+            setValue: value => _config.OffsetX = value,
             min: -128,
             max: 128
         );

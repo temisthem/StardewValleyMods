@@ -9,13 +9,14 @@ internal partial class Mod {
     public class Object_placementAction_Patch {
         public static void Postfix(Object __instance, ref bool __result, GameLocation location, int x, int y,
             Farmer who = null) {
-            if (!Config.Enabled) return;
+            if (!_config.Enabled) return;
 
+            // ReSharper disable once PossibleLossOfFraction
             Vector2 placementTile = new(x / 64, y / 64);
-            Dictionary<string, string> floorPathItemLookup = Flooring.GetFloorPathItemLookup();
+            var floorPathItemLookup = Flooring.GetFloorPathItemLookup();
 
             if (!__instance.IsFloorPathItem()
-                || !location.terrainFeatures.TryGetValue(placementTile, out TerrainFeature terrainFeature)
+                || !location.terrainFeatures.TryGetValue(placementTile, out var terrainFeature)
                 || terrainFeature is not HoeDirt hoeDirt) return;
             
             location.terrainFeatures.Remove(hoeDirt.Tile);

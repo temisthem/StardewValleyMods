@@ -5,12 +5,12 @@ using StardewModdingAPI.Events;
 namespace PlaceFloorOnTilledDirt;
 
 internal partial class Mod: StardewModdingAPI.Mod {
-    internal static Configuration Config;
-    internal static IModHelper ModHelper;
+    private static Configuration _config;
+    private static IModHelper _modHelper;
 
     public override void Entry(IModHelper helper) {
-        Config = helper.ReadConfig<Configuration>();
-        ModHelper = helper;
+        _config = helper.ReadConfig<Configuration>();
+        _modHelper = helper;
         I18n.Init(helper.Translation);
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -27,22 +27,22 @@ internal partial class Mod: StardewModdingAPI.Mod {
     }
 
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
-        var configMenu = ModHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+        var configMenu = _modHelper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);
     }
 
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
-            reset: () => Config = new Configuration(),
-            save: () => ModHelper.WriteConfig(Config)
+            reset: () => _config = new Configuration(),
+            save: () => _modHelper.WriteConfig(_config)
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.Enabled,
-            getValue: () => Config.Enabled,
-            setValue: value => Config.Enabled = value
+            getValue: () => _config.Enabled,
+            setValue: value => _config.Enabled = value
         );
     }
 }

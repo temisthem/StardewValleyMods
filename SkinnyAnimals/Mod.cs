@@ -6,10 +6,10 @@ using StardewValley;
 namespace SkinnyAnimals;
 
 internal partial class Mod: StardewModdingAPI.Mod {
-    public static Configuration Config;
+    private static Configuration _config;
 
     public override void Entry(IModHelper helper) {
-        Config = Helper.ReadConfig<Configuration>();
+        _config = Helper.ReadConfig<Configuration>();
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         ApplyHarmonyPatches();
@@ -33,22 +33,22 @@ internal partial class Mod: StardewModdingAPI.Mod {
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
-            reset: () => Config = new Configuration(),
-            save: () => Helper.WriteConfig(Config)
+            reset: () => _config = new Configuration(),
+            save: () => Helper.WriteConfig(_config)
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: () => "Enabled", 
-            getValue: () => Config.Enabled,
-            setValue: value => Config.Enabled = value
+            getValue: () => _config.Enabled,
+            setValue: value => _config.Enabled = value
         );
         
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: () => "Push Speed Multiplier", 
-            getValue: () => Config.PushSpeedMultiplier,
-            setValue: value => Config.PushSpeedMultiplier = value,
+            getValue: () => _config.PushSpeedMultiplier,
+            setValue: value => _config.PushSpeedMultiplier = value,
             tooltip: () => "Multiplies the speed of you pushing past animals, only applies when ignore collision is off",
             min: 1,
             max: 10
@@ -57,8 +57,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: () => "Ignore Collision", 
-            getValue: () => Config.IgnoreCollision,
-            setValue: value => Config.IgnoreCollision = value
+            getValue: () => _config.IgnoreCollision,
+            setValue: value => _config.IgnoreCollision = value
         );
     }
 }

@@ -5,18 +5,18 @@ namespace SkinnyAnimals;
 internal partial class Mod {
     
     public class FarmAnimal_farmerPushing_Patch {
-        private static bool isEnabled() {
-            if (!Config.Enabled) return false;
-            if (Config.PushSpeedMultiplier == 1 && !Config.IgnoreCollision) return false;
+        private static bool IsEnabled() {
+            if (!_config.Enabled) return false;
+            if (_config.PushSpeedMultiplier == 1 && !_config.IgnoreCollision) return false;
             
             return true;
         }
         public static void Postfix(FarmAnimal __instance) {
-            if (!isEnabled()) return;
+            if (!IsEnabled()) return;
             if (__instance.pushAccumulator > 60) return;
 
-            if (Config.IgnoreCollision) __instance.pushAccumulator = 61;
-            else __instance.pushAccumulator += Config.PushSpeedMultiplier-1;
+            if (_config.IgnoreCollision) __instance.pushAccumulator = 61;
+            else __instance.pushAccumulator += _config.PushSpeedMultiplier-1;
         }
     }
 }

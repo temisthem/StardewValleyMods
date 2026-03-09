@@ -3,7 +3,40 @@
 // List of qualified IDs for all machines in Machines/Data
 // that have Trigger: "ItemPlacedInMachine", except for the crab pot.
 
-public struct VanillaMachineQualifiedIds {
+public static class VanillaMachineQualifiedIds
+{
+    private static readonly HashSet<string> Set = new()
+    {
+        BoneMill,
+        Cask,
+        CharcoalKiln,
+        Loom,
+        Furnace,
+        Deconstructor,
+        Keg,
+        Jar,
+        CheesePress,
+        RecyclingMachine,
+        MayonnaiseMachine,
+        OilMaker,
+        Incubator,
+        OstrichIncubator,
+        SlimeIncubator,
+        SlimeEggPress,
+        Crystalarium,
+        SeedMaker,
+        GeodeCrusher,
+        WoodChipper,
+        BaitMaker,
+        Dehydrator,
+        HeavyFurnace,
+        Anvil,
+        FishSmoker,
+        CrabPot
+    };
+    
+    public static bool Contains(string id) => Set.Contains(id);
+    
     public const string BoneMill = "(BC)90";
     public const string Cask = "(BC)163";
     public const string CharcoalKiln = "(BC)114";
@@ -30,35 +63,4 @@ public struct VanillaMachineQualifiedIds {
     public const string Anvil = "(BC)Anvil";
     public const string FishSmoker = "(BC)FishSmoker";
     public const string CrabPot = "(O)710";
-
-    public static List<string> AsList() {
-        return new List<string> {
-            BoneMill,
-            Cask,
-            CharcoalKiln,
-            Loom,
-            Furnace,
-            Deconstructor,
-            Keg,
-            Jar,
-            CheesePress,
-            RecyclingMachine,
-            MayonnaiseMachine,
-            OilMaker,
-            Incubator,
-            OstrichIncubator,
-            SlimeIncubator,
-            SlimeEggPress,
-            Crystalarium,
-            SeedMaker,
-            GeodeCrusher,
-            WoodChipper,
-            BaitMaker,
-            Dehydrator,
-            HeavyFurnace,
-            Anvil,
-            FishSmoker,
-            CrabPot
-        };
-    }
 }

@@ -6,6 +6,7 @@ internal class Configuration {
     public bool JarsEnabled { get; set; } = true;
     public bool KegsEnabled { get; set; } = true;
     public bool CasksEnabled { get; set; } = true;
+    public bool CasksOutsideOfCellarEnabled { get; set; } = false;
     public bool MayonnaiseMachinesEnabled { get; set; } = false;
     public bool CheesePressesEnabled { get; set; } = false;
     public bool LoomsEnabled { get; set; } = false;

@@ -22,7 +22,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         helper.Events.GameLoop.UpdateTicked += UpdateTicked;
-        Helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
+        Helper.Events.GameLoop.SaveLoaded += SaveLoaded;
+        Helper.Events.Input.ButtonsChanged += InputButtonsChanged;
         ApplyHarmonyPatches();
     }
     
@@ -50,12 +51,16 @@ internal partial class Mod: StardewModdingAPI.Mod {
         if (configMenu is not null) RegisterConfig(configMenu);
     }
     
-    private void Input_ButtonsChanged(object sender, ButtonsChangedEventArgs e) {
+    private static void SaveLoaded(object sender, SaveLoadedEventArgs e) {
+        _toggleEmoteEnabled = false;
+    }
+    
+    private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
         if (!_config.Enabled) return;
         if (_config.ToggleEmoteKey.JustPressed()) _toggleEmoteEnabled = !_toggleEmoteEnabled;
     }
     
-    private void UpdateTicked(object sender, UpdateTickedEventArgs e) {
+    private static void UpdateTicked(object sender, UpdateTickedEventArgs e) {
         if (!_config.Enabled) return;
         AnimateEmote();
     }

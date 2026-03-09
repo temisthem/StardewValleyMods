@@ -19,7 +19,7 @@ internal partial class Mod {
             }
 
             if (_config.DisplayBubbleForSeeds) {
-                if (__instance.bush.Value is not null) 
+                if (__instance.bush.Value is not null)
                     return;
                 DrawSeedBubble(__instance.hoeDirt.Get(), spriteBatch);
             }
@@ -39,65 +39,51 @@ internal partial class Mod {
             }
         }
     }
-
-    private static bool IsItemFertilizer(Item item) {
-        if (item is null) return false;
-        if (item.QualifiedItemId == "(O)805") return false; // Tree Fertilizer
-        return item.HasContextTag("fertilizer_item") || item.HasContextTag("quality_fertilizer_item");
-    }
-
-    private static bool IsItemSeed(Item item) {
-        if (item is null) return false;
-        var obj = new Object(item.ItemId, 1);
-        return obj.Type == "Seeds";
-    }
-
-    private static void DrawFertilizerBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
-        if (__instance.HasFertilizer()) 
+    
+    private static void DrawFertilizerBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
+        if (hoeDirt.HasFertilizer())
             return;
-        if (_config.HideWhenNoCrop && __instance.crop is null) 
+        if (IsTileObstructed(hoeDirt.Tile))
+            return;
+        if (_config.HideWhenNoCrop && hoeDirt.crop is null)
             return;
 
         var currentItem = Game1.player.CurrentItem;
+        if (IsItemSeed(currentItem))
+            return;
 
-        if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem)) 
+        if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem))
             return;
-        if (IsTileObstructed(__instance.Tile)) 
+        if (!_config.DisplayWhenHeld && !_toggleEmoteEnabled)
             return;
+
         if (_config.HideWhenUnusable) {
-            if (currentItem is not null && !__instance.CanApplyFertilizer(currentItem.QualifiedItemId)) 
+            if (currentItem is not null && !hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId))
                 return;
-            if (__instance.crop?.indexOfHarvest.Value == "771") //Ignore fiber plants
+            if (hoeDirt.crop?.indexOfHarvest.Value == "771") //Ignore fiber plants
                 return;
         }
-        if (!_config.DisplayWhenHeld && !_toggleEmoteEnabled) 
-            return;
-        if (IsItemSeed(currentItem)) 
-            return;
-        
-        DrawBubble(__instance, spriteBatch);
+
+        DrawBubble(hoeDirt, spriteBatch);
     }
 
-    private static void DrawSeedBubble(HoeDirt __instance, SpriteBatch spriteBatch) {
+    private static void DrawSeedBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
+        if (hoeDirt.crop is not null)
+            return;
+        if (IsTileObstructed(hoeDirt.Tile))
+            return;
+
         var currentItem = Game1.player.CurrentItem;
-
-        if (__instance.crop is not null) 
+        if (!IsItemSeed(currentItem))
             return;
-        if (IsTileObstructed(__instance.Tile)) 
-            return;
-        if (currentItem is not null && !__instance.canPlantThisSeedHere(currentItem.ItemId)) 
-            return;
-        if (!IsItemSeed(currentItem)) 
+        if (currentItem is not null && !hoeDirt.canPlantThisSeedHere(currentItem.ItemId))
             return;
 
-        DrawBubble(__instance, spriteBatch);
+        DrawBubble(hoeDirt, spriteBatch);
     }
 
-    private static bool IsTileObstructed(Vector2 tile)
-        => Game1.currentLocation.objects.TryGetValue(tile, out var obj) && obj is not IndoorPot;
-
-    private static void DrawBubble(HoeDirt __instance, SpriteBatch spriteBatch, float yOffset = 0f) {
-        var tilePosition = GetEmotePosition(__instance, out var emotePosition);
+    private static void DrawBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
+        var emotePosition = GetEmotePosition(hoeDirt);
 
         spriteBatch.Draw(Game1.emoteSpriteSheet,
             emotePosition,
@@ -113,12 +99,23 @@ internal partial class Mod {
             1f);
     }
 
-    private static Vector2 GetEmotePosition(HoeDirt __instance, out Vector2 emotePosition) {
-        Vector2 tilePosition = __instance.Tile;
-        emotePosition = Game1.GlobalToLocal(tilePosition * 64);
-        float movePercent = (100 - _config.SizePercent) / 100f;
+    private static Vector2 GetEmotePosition(HoeDirt hoeDirt) {
+        var emotePosition = Game1.GlobalToLocal(hoeDirt.Tile * 64);
+        var movePercent = (100 - _config.SizePercent) / 100f;
         emotePosition.Y -= 48 - movePercent * 32;
         emotePosition += new Vector2(movePercent * 32 + _config.OffsetX, movePercent * 32 + _config.OffsetY);
-        return tilePosition;
+        return emotePosition;
     }
+
+    private static bool IsItemFertilizer(Item item) {
+        if (item is null) return false;
+        if (item.QualifiedItemId == "(O)805") return false; // Tree Fertilizer
+        return item.HasContextTag("fertilizer_item") || item.HasContextTag("quality_fertilizer_item");
+    }
+
+    private static bool IsItemSeed(Item item) => item is not null && item.HasContextTag("seed_item");
+
+
+    private static bool IsTileObstructed(Vector2 tile)
+        => Game1.currentLocation.objects.TryGetValue(tile, out var obj) && obj is not IndoorPot;
 }

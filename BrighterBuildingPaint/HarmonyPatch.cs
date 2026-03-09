@@ -13,19 +13,19 @@ internal partial class Mod {
         public int Delta;
     }
 
-    private static readonly List<AdjustButton> _adjustButtons = new();
+    private static readonly List<AdjustButton> AdjustButtons = new();
 
     public class BuildingPaintMenu_BuildingColorSlider_Patch {
         public static void Postfix(BuildingPaintMenu.BuildingColorSlider __instance) {
-            if (!Config.Enabled) return;
+            if (!_config.Enabled) return;
 
             if (__instance.handle.myID == 107) {
-                __instance.max = Config.MaxSaturation;
+                __instance.max = _config.MaxSaturation;
             }
 
             if (__instance.handle.myID == 108) {
-                __instance.max = Config.MaxBrightness;
-                __instance.min = Config.MinBrightness;
+                __instance.max = _config.MaxBrightness;
+                __instance.min = _config.MinBrightness;
             }
         }
     }
@@ -40,9 +40,9 @@ internal partial class Mod {
         private const int HoverGrow = 1;
 
         public static void Postfix(BuildingPaintMenu.ColorSliderPanel __instance, SpriteBatch b) {
-            if (!Config.Enabled) return;
+            if (!_config.Enabled) return;
 
-            _adjustButtons.Clear();
+            AdjustButtons.Clear();
 
             var baseX = __instance.buildingPaintMenu.xPositionOnScreen + IClickableMenu.borderWidth + MarginX;
             var baseY = __instance.buildingPaintMenu.yPositionOnScreen + IClickableMenu.borderWidth + MarginY;
@@ -61,11 +61,11 @@ internal partial class Mod {
                 Utility.drawTextWithShadow(b, label + ": " + slider.GetValue(), Game1.dialogueFont, new Vector2(baseX, y), Game1.textColor, 0.8f);
 
                 DrawButton(b, btnBaseX, y, "-");
-                _adjustButtons.Add(new AdjustButton { Bounds = new Rectangle(btnBaseX, y, BtnSize, BtnSize), Slider = slider, Delta = -1 });
+                AdjustButtons.Add(new AdjustButton { Bounds = new Rectangle(btnBaseX, y, BtnSize, BtnSize), Slider = slider, Delta = -1 });
 
                 var plusX = btnBaseX + BtnSize + BtnGap;
                 DrawButton(b, plusX, y, "+", 4);
-                _adjustButtons.Add(new AdjustButton { Bounds = new Rectangle(plusX, y, BtnSize, BtnSize), Slider = slider, Delta = 1 });
+                AdjustButtons.Add(new AdjustButton { Bounds = new Rectangle(plusX, y, BtnSize, BtnSize), Slider = slider, Delta = 1 });
             }
         }
 
@@ -88,9 +88,9 @@ internal partial class Mod {
     public class BuildingPaintMenu_ReceiveLeftClick_Patch {
         public static void Postfix(BuildingPaintMenu.ColorSliderPanel __instance, int x, int y)
         {
-            if (!Config.Enabled) return;
+            if (!_config.Enabled) return;
 
-            foreach (var button in _adjustButtons.Where(button => button.Bounds.Contains(x, y)))
+            foreach (var button in AdjustButtons.Where(button => button.Bounds.Contains(x, y)))
             {
                 button.Slider.SetValue(button.Slider.GetValue() + button.Delta);
                 Game1.playSound("smallSelect");

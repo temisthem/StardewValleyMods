@@ -8,10 +8,10 @@ using StardewValley.Menus;
 namespace BrighterBuildingPaint;
 
 internal partial class Mod: StardewModdingAPI.Mod {
-    internal static Configuration Config;
+    private static Configuration _config;
 
     public override void Entry(IModHelper helper) {
-        Config = Helper.ReadConfig<Configuration>();
+        _config = Helper.ReadConfig<Configuration>();
         I18n.Init(helper.Translation);
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         ApplyHarmonyPatches();
@@ -59,22 +59,22 @@ internal partial class Mod: StardewModdingAPI.Mod {
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {
         configMenu.Register(
             mod: ModManifest,
-            reset: () => Config = new Configuration(),
-            save: () => Helper.WriteConfig(Config)
+            reset: () => _config = new Configuration(),
+            save: () => Helper.WriteConfig(_config)
         );
         
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.Enabled,
-            getValue: () => Config.Enabled,
-            setValue: value => Config.Enabled = value
+            getValue: () => _config.Enabled,
+            setValue: value => _config.Enabled = value
         );
         
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.MaxBrightness,
-            getValue: () => Config.MaxBrightness,
-            setValue: value => Config.MaxBrightness = value,
+            getValue: () => _config.MaxBrightness,
+            setValue: value => _config.MaxBrightness = value,
             min: 0,
             max: 100
         );
@@ -82,8 +82,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.MinBrightness,
-            getValue: () => Config.MinBrightness,
-            setValue: value => Config.MinBrightness = value,
+            getValue: () => _config.MinBrightness,
+            setValue: value => _config.MinBrightness = value,
             min: -100,
             max: 0
         );
@@ -91,8 +91,8 @@ internal partial class Mod: StardewModdingAPI.Mod {
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.MaxSaturation,
-            getValue: () => Config.MaxSaturation,
-            setValue: value => Config.MaxSaturation = value,
+            getValue: () => _config.MaxSaturation,
+            setValue: value => _config.MaxSaturation = value,
             min: 0,
             max: 100
         );

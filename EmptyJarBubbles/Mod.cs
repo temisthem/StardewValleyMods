@@ -17,6 +17,7 @@ internal class Mod: StardewModdingAPI.Mod {
     private static List<Object> _machines;
     private static Dictionary<string, MachineData> _machineData;
     private static List<string> _moddedMachineQualifiedIds;
+    private static bool _emoteEnabled;
 
     public override void Entry(IModHelper helper) {
         _config = Helper.ReadConfig<Configuration>();
@@ -24,6 +25,7 @@ internal class Mod: StardewModdingAPI.Mod {
 
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         helper.Events.GameLoop.SaveLoaded += SaveLoaded;
+        helper.Events.Input.ButtonsChanged += InputButtonsChanged;
         helper.Events.GameLoop.DayStarted += DayStarted;
         helper.Events.GameLoop.ReturnedToTitle += ReturnedToTitle;
         helper.Events.GameLoop.UpdateTicked += UpdateTicked;
@@ -53,8 +55,14 @@ internal class Mod: StardewModdingAPI.Mod {
         }
     }
 
+    private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
+        if (!_config.Enabled) return;
+        if (_config.ToggleEmoteKey.JustPressed()) _emoteEnabled = !_emoteEnabled;
+    }
+
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
+        _emoteEnabled = !_config.DisabledUntilToggledOn;
         Helper.Events.Display.RenderedWorld += RenderBubbles;
         _machineData = DataLoader.Machines(Game1.content);
         _moddedMachineQualifiedIds = GetModdedMachinesFromMachineData();
@@ -157,6 +165,7 @@ internal class Mod: StardewModdingAPI.Mod {
     
     private static void RenderBubbles(object sender, RenderedWorldEventArgs e) {
         if (!_config.Enabled) return;
+        if (!_emoteEnabled) return;
 
         foreach (var machine in _machines.Where(IsMachineRenderReady))
             DrawBubbles(machine, e.SpriteBatch);
@@ -208,6 +217,22 @@ internal class Mod: StardewModdingAPI.Mod {
             setValue: value => _config.Enabled = value
         );
         
+        configMenu.AddKeybindList(
+            mod: ModManifest,
+            name: I18n.ToggleEmoteKey,
+            tooltip: I18n.ToggleEmoteKeyTooltip,
+            getValue: () => _config.ToggleEmoteKey,
+            setValue: value => _config.ToggleEmoteKey = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.DisabledUntilToggledOn,
+            tooltip: I18n.DisabledUntilToggledOnTooltip,
+            getValue: () => _config.DisabledUntilToggledOn,
+            setValue: value => _config.DisabledUntilToggledOn = value
+        );
+
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleYOffset,

@@ -1,5 +1,9 @@
 ﻿{
   "enabled": "Enabled",
+  "toggle-emote-key": "Toggle Emote Key",
+  "toggle-emote-key-tooltip": "Press this key to hide/show bubbles",
+  "disabled-until-toggled-on": "Disabled until toggled on",
+  "disabled-until-toggled-on-tooltip": "By default, bubbles are disabled until toggled active",
   "modded-machines-enabled": "Modded Machines Enabled",
   "modded-machines-enabled-tooltip": "This will enable bubbles for ALL modded machines",
   "bubble-y-offset": "Bubble Y Offset",

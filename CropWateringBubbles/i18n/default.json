@@ -1,10 +1,14 @@
 {
-  "GMCM_Option_ModEnabled_Name": "Mod Enabled",
-  "GMCM_Option_OpacityPercent_Name": "Opacity Percent",
-  "GMCM_Option_SizePercent_Name": "Size Percent",
-  "GMCM_Option_PressKeys_Name": "Press Keys",
-  "GMCM_Option_RepeatInterval_Name": "Repeat Interval",
-  "GMCM_Option_RequireKeyPress_Name": "Require Key Press",
-  "GMCM_Option_IncludeGiantable_Name": "Show For Giantable",
-  "GMCM_Option_OnlyWhenWatering_Name": "Only When Watering"
+  "enabled": "Enabled",
+  "only-when-watering": "Only When Watering",
+  "include-giantable": "Show For Giantable",
+  "toggle-emote-key": "Toggle Emote Key",
+  "toggle-emote-key-tooltip": "Press this key to hide/show bubbles",
+  "default-toggle-on": "Default Toggle On",
+  "default-toggle-on-tooltip": "When a toggle key is set, start with bubbles visible",
+  "bubble-y-offset": "Bubble Y Offset",
+  "bubble-x-offset": "Bubble X Offset",
+  "emote-interval": "Emote Interval (ms)",
+  "opacity": "Opacity",
+  "bubble-size": "Bubble Size"
 }

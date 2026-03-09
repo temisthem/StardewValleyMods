@@ -13,8 +13,8 @@ namespace BetterTruffles;
 internal partial class Mod {
   public class Object_draw_Patch {
     public static void Postfix(Object __instance, SpriteBatch spriteBatch, int x, int y, float alpha = 1f) {
-      if (!Config.Enabled) return;
-      if (!Config.ShowBubbles) return;
+      if (!_config.Enabled) return;
+      if (!_config.ShowBubbles) return;
       if (__instance.QualifiedItemId != "(O)430" && !__instance.HasContextTag("temisthem_bettertruffles")) return;
 
       var item = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId);
@@ -22,39 +22,39 @@ internal partial class Mod {
       
       float base_sort = (tileLocation.Y + 1) * 64 / 10000f + tileLocation.X / 50000f;
       float yOffset = 4f * (float)Math.Round(Math.Sin(Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 250.0), 2);
-      float movePercent = (100 - Config.SizePercent) / 100f;
+      float movePercent = (100 - _config.SizePercent) / 100f;
 
       spriteBatch.Draw(Game1.mouseCursors, 
         Game1.GlobalToLocal(Game1.viewport, new Vector2(
-          tileLocation.X * 64 - 8 + movePercent * 40 + Config.OffsetX, tileLocation.Y * 64 - 96 - 16 + yOffset + 
-          movePercent * 96 + Config.OffsetY)),
+          tileLocation.X * 64 - 8 + movePercent * 40 + _config.OffsetX, tileLocation.Y * 64 - 96 - 16 + yOffset + 
+          movePercent * 96 + _config.OffsetY)),
         new Rectangle(141, 465, 20, 24), 
-        Color.White * (Config.OpacityPercent / 100f), 
+        Color.White * (_config.OpacityPercent / 100f), 
         0f, 
         Vector2.Zero, 
-        4f * (Config.SizePercent / 100f), 
+        4f * (_config.SizePercent / 100f), 
         SpriteEffects.None, 
-        Config.RenderOnTop ? 0.99f : base_sort + 1E-06f);
+        _config.RenderOnTop ? 0.99f : base_sort + 1E-06f);
 
       spriteBatch.Draw(
         item.GetTexture(),
         Game1.GlobalToLocal(Game1.viewport, new Vector2(
-          tileLocation.X * 64 + 32 + Config.OffsetX, tileLocation.Y * 64 - 64 - 8 + yOffset + movePercent * 56 +
-           Config.OffsetY)),
+          tileLocation.X * 64 + 32 + _config.OffsetX, tileLocation.Y * 64 - 64 - 8 + yOffset + movePercent * 56 +
+           _config.OffsetY)),
         item.GetSourceRect(),
-        Color.White * (Config.OpacityPercent / 100f),
+        Color.White * (_config.OpacityPercent / 100f),
         0f, 
         new Vector2(8f, 8f), 
-        4f * (Config.SizePercent / 100f),
+        4f * (_config.SizePercent / 100f),
         SpriteEffects.None, 
-        Config.RenderOnTop ? 0.991f : base_sort + 1E-05f
+        _config.RenderOnTop ? 0.991f : base_sort + 1E-05f
       );
     }
   }  
   public class FarmAnimal_behaviors_Patch {
     public static bool Prefix(ref bool __result, FarmAnimal __instance, GameTime time, GameLocation location) {
-      if (!Config.Enabled) return true;
-      if (!Config.PigsDigInGrass && !Config.PigsDigInFlooring) return true;
+      if (!_config.Enabled) return true;
+      if (!_config.PigsDigInGrass && !_config.PigsDigInFlooring) return true;
       
       if (!Game1.IsMasterGame) {
         __result = false;
@@ -66,9 +66,9 @@ internal partial class Mod {
         return false;
       }
       
-      IReflectedField<float> nextFollowTargetScan = ModHelper.Reflection.GetField<float>(__instance, "_nextFollowTargetScan");
-      IReflectedField<FarmAnimal> followTarget = ModHelper.Reflection.GetField<FarmAnimal>(__instance, "_followTarget");
-      IReflectedField<Point?> followTargetPosition = ModHelper.Reflection.GetField<Point?>(__instance, "_followTargetPosition");
+      IReflectedField<float> nextFollowTargetScan = _modHelper.Reflection.GetField<float>(__instance, "_nextFollowTargetScan");
+      IReflectedField<FarmAnimal> followTarget = _modHelper.Reflection.GetField<FarmAnimal>(__instance, "_followTarget");
+      IReflectedField<Point?> followTargetPosition = _modHelper.Reflection.GetField<Point?>(__instance, "_followTargetPosition");
       
       if (__instance.isBaby() && __instance.CanFollowAdult()) {
 
@@ -167,7 +167,7 @@ internal partial class Mod {
           followTargetPosition.SetValue(new Point?());
         }
       }
-      if ((BetterPigsApi?.CanDigUpProduce(__instance) ?? false) || (location.IsOutdoors && !location.IsRainingHere() && !location.IsWinterHere() && __instance.currentProduce.Value != null && __instance.isAdult() && __instance.GetHarvestType().GetValueOrDefault() == FarmAnimalHarvestType.DigUp && Game1.random.NextDouble() < 0.0002))
+      if ((_betterPigsApi?.CanDigUpProduce(__instance) ?? false) || (location.IsOutdoors && !location.IsRainingHere() && !location.IsWinterHere() && __instance.currentProduce.Value != null && __instance.isAdult() && __instance.GetHarvestType().GetValueOrDefault() == FarmAnimalHarvestType.DigUp && Game1.random.NextDouble() < 0.0002))
       {
         Object produce = ItemRegistry.Create<Object>(__instance.currentProduce.Value);
         Microsoft.Xna.Framework.Rectangle boundingBox = __instance.GetBoundingBox();
@@ -185,9 +185,9 @@ internal partial class Mod {
           switch (terrainFeature) {
             case null:
               continue;
-            case Grass when Config.PigsDigInGrass:
+            case Grass when _config.PigsDigInGrass:
               continue;
-            case Flooring when Config.PigsDigInFlooring:
+            case Flooring when _config.PigsDigInFlooring:
               continue;
             default:
               __result = false;

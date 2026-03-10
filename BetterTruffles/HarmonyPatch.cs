@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
@@ -8,7 +8,7 @@ using StardewValley.Pathfinding;
 using StardewValley.TerrainFeatures;
 using Object = StardewValley.Object;
 
-namespace BetterTruffles; 
+namespace BetterTruffles;
 
 internal partial class Mod {
   public class Object_draw_Patch {
@@ -19,21 +19,21 @@ internal partial class Mod {
 
       var item = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId);
       var tileLocation = __instance.TileLocation;
-      
+
       float base_sort = (tileLocation.Y + 1) * 64 / 10000f + tileLocation.X / 50000f;
       float yOffset = 4f * (float)Math.Round(Math.Sin(Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 250.0), 2);
-      float movePercent = (100 - _config.SizePercent) / 100f;
+      float movePercent = _config.MovePercent;
 
-      spriteBatch.Draw(Game1.mouseCursors, 
+      spriteBatch.Draw(Game1.mouseCursors,
         Game1.GlobalToLocal(Game1.viewport, new Vector2(
-          tileLocation.X * 64 - 8 + movePercent * 40 + _config.OffsetX, tileLocation.Y * 64 - 96 - 16 + yOffset + 
+          tileLocation.X * 64 - 8 + movePercent * 40 + _config.OffsetX, tileLocation.Y * 64 - 96 - 16 + yOffset +
           movePercent * 96 + _config.OffsetY)),
-        new Rectangle(141, 465, 20, 24), 
-        Color.White * (_config.OpacityPercent / 100f), 
-        0f, 
-        Vector2.Zero, 
-        4f * (_config.SizePercent / 100f), 
-        SpriteEffects.None, 
+        new Rectangle(141, 465, 20, 24),
+        Color.White * _config.Opacity,
+        0f,
+        Vector2.Zero,
+        _config.Scale,
+        SpriteEffects.None,
         _config.RenderOnTop ? 0.99f : base_sort + 1E-06f);
 
       spriteBatch.Draw(
@@ -42,20 +42,20 @@ internal partial class Mod {
           tileLocation.X * 64 + 32 + _config.OffsetX, tileLocation.Y * 64 - 64 - 8 + yOffset + movePercent * 56 +
            _config.OffsetY)),
         item.GetSourceRect(),
-        Color.White * (_config.OpacityPercent / 100f),
-        0f, 
-        new Vector2(8f, 8f), 
-        4f * (_config.SizePercent / 100f),
-        SpriteEffects.None, 
+        Color.White * _config.Opacity,
+        0f,
+        new Vector2(8f, 8f),
+        _config.Scale,
+        SpriteEffects.None,
         _config.RenderOnTop ? 0.991f : base_sort + 1E-05f
       );
     }
-  }  
+  }
   public class FarmAnimal_behaviors_Patch {
     public static bool Prefix(ref bool __result, FarmAnimal __instance, GameTime time, GameLocation location) {
       if (!_config.Enabled) return true;
       if (!_config.PigsDigInGrass && !_config.PigsDigInFlooring) return true;
-      
+
       if (!Game1.IsMasterGame) {
         __result = false;
         return false;
@@ -65,11 +65,11 @@ internal partial class Mod {
         __result = false;
         return false;
       }
-      
+
       IReflectedField<float> nextFollowTargetScan = _modHelper.Reflection.GetField<float>(__instance, "_nextFollowTargetScan");
       IReflectedField<FarmAnimal> followTarget = _modHelper.Reflection.GetField<FarmAnimal>(__instance, "_followTarget");
       IReflectedField<Point?> followTargetPosition = _modHelper.Reflection.GetField<Point?>(__instance, "_followTargetPosition");
-      
+
       if (__instance.isBaby() && __instance.CanFollowAdult()) {
 
         nextFollowTargetScan.SetValue(nextFollowTargetScan.GetValue() - (float) time.ElapsedGameTime.TotalSeconds);
@@ -175,7 +175,7 @@ internal partial class Mod {
         {
           Vector2 cornersOfThisRectangle = Utility.getCornersOfThisRectangle(ref boundingBox, corner);
           Vector2 key = new Vector2((float) (int) ((double) cornersOfThisRectangle.X / 64.0), (float) (int) ((double) cornersOfThisRectangle.Y / 64.0));
-          
+
           if (location.objects.ContainsKey(key)) {
             __result = false;
             return false;

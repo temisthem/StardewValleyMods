@@ -1,3 +1,4 @@
+using TemLib;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -10,9 +11,7 @@ namespace CropWateringBubbles;
 
 internal partial class Mod : StardewModdingAPI.Mod {
     private static Configuration _config;
-    private static int _currentEmoteInterval;
-    private static int _currentEmoteFrame;
-    private static bool _emoteEnabled;
+    private static readonly EmoteManager _emoteManager = new();
 
     public override void Entry(IModHelper helper) {
         _config = helper.ReadConfig<Configuration>();
@@ -45,30 +44,18 @@ internal partial class Mod : StardewModdingAPI.Mod {
     }
 
     private static void SaveLoaded(object sender, SaveLoadedEventArgs e) {
-        _emoteEnabled = !_config.ToggleEmoteKey.IsBound || _config.DefaultToggleOn;
+        _emoteManager.InitOnSaveLoaded(_config);
     }
 
     private static void UpdateTicked(object sender, UpdateTickedEventArgs e) {
         if (!_config.Enabled) return;
-        AnimateEmote();
-    }
-
-    private static void AnimateEmote() {
-        _currentEmoteInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
-
-        if (_currentEmoteFrame is < 28 or > 31) _currentEmoteFrame = 28;
-        if (_currentEmoteInterval > _config.EmoteInterval) {
-            if (_currentEmoteFrame < 31) _currentEmoteFrame++;
-            else _currentEmoteFrame = 28;
-            _currentEmoteInterval = 0;
-        }
+        _emoteManager.Animate(_config, 28, 31);
     }
 
     private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
-        if (!_config.Enabled) return;
-        if (_config.ToggleEmoteKey.JustPressed()) _emoteEnabled = !_emoteEnabled;
+        _emoteManager.HandleToggleInput(_config);
     }
-    
+
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
         var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);

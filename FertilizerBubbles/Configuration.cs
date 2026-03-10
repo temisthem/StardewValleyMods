@@ -1,21 +1,11 @@
-using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
+using TemLib;
 
-namespace FertilizerBubbles; 
+namespace FertilizerBubbles;
 
-internal class Configuration {
-    public bool Enabled { get; set; } = true;
+internal class Configuration : EmoteBubbleConfig {
     public bool DisplayBubbleForFertilizers { get; set; } = true;
     public bool DisplayBubbleForSeeds { get; set; } = false;
     public bool DisplayWhenHeld { get; set; } = true;
-    public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
-    public bool DefaultToggleOn { get; set; } = false;
     public bool HideWhenUnusable { get; set; } = true;
     public bool HideWhenNoCrop { get; set; } = false;
-
-    public int OffsetY { get; set; } = 0;
-    public int OffsetX { get; set; } = 0;
-    public int EmoteInterval { get; set; } = 250;
-    public int OpacityPercent { get; set; } = 75;
-    public int SizePercent { get; set; } = 75;
 }

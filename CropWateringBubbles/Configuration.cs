@@ -1,17 +1,13 @@
-using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
+using TemLib;
 
 namespace CropWateringBubbles;
 
-internal class Configuration {
-    public bool Enabled { get; set; } = true;
-    public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
-    public bool DefaultToggleOn { get; set; } = false;
+internal class Configuration : EmoteBubbleConfig {
     public bool OnlyWhenWatering { get; set; } = false;
     public bool IncludeGiantable { get; set; } = true;
-    public int OffsetY { get; set; } = 0;
-    public int OffsetX { get; set; } = 0;
-    public int EmoteInterval { get; set; } = 250;
-    public int OpacityPercent { get; set; } = 75;
-    public int SizePercent { get; set; } = 100;
+
+    public Configuration() {
+        SizePercent = 100;
+        OffsetY = 0;
+    }
 }

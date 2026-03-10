@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+using TemLib;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Objects;
@@ -11,9 +12,9 @@ internal partial class Mod {
     public class IndoorPot_draw_Patch {
         public static void Postfix(IndoorPot __instance, SpriteBatch spriteBatch) {
             if (!_config.Enabled) return;
-            
+
             if (_config.DisplayBubbleForFertilizers) {
-                if (_config.HideWhenUnusable && __instance.bush.Value is not null) 
+                if (_config.HideWhenUnusable && __instance.bush.Value is not null)
                     return;
                 DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch);
             }
@@ -39,7 +40,7 @@ internal partial class Mod {
             }
         }
     }
-    
+
     private static void DrawFertilizerBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
         if (hoeDirt.HasFertilizer())
             return;
@@ -54,7 +55,7 @@ internal partial class Mod {
 
         if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem))
             return;
-        if (!_config.DisplayWhenHeld && !_toggleEmoteEnabled)
+        if (!_config.DisplayWhenHeld && !_emoteManager.EmoteEnabled)
             return;
 
         if (_config.HideWhenUnusable) {
@@ -84,24 +85,12 @@ internal partial class Mod {
 
     private static void DrawBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
         var emotePosition = GetEmotePosition(hoeDirt);
-
-        spriteBatch.Draw(Game1.emoteSpriteSheet,
-            emotePosition,
-            new Rectangle(_currentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width,
-                _currentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16,
-                16,
-                16),
-            Color.White * (_config.OpacityPercent / 100f),
-            0f,
-            Vector2.Zero,
-            4f * _config.SizePercent / 100f,
-            SpriteEffects.None,
-            1f);
+        BubbleDrawHelper.DrawEmoteBubble(spriteBatch, emotePosition, _config, _emoteManager.CurrentFrame, 1f);
     }
 
     private static Vector2 GetEmotePosition(HoeDirt hoeDirt) {
         var emotePosition = Game1.GlobalToLocal(hoeDirt.Tile * 64);
-        var movePercent = (100 - _config.SizePercent) / 100f;
+        var movePercent = _config.MovePercent;
         emotePosition.Y -= 48 - movePercent * 32;
         emotePosition += new Vector2(movePercent * 32 + _config.OffsetX, movePercent * 32 + _config.OffsetY);
         return emotePosition;
@@ -114,7 +103,6 @@ internal partial class Mod {
     }
 
     private static bool IsItemSeed(Item item) => item is not null && item.HasContextTag("seed_item");
-
 
     private static bool IsTileObstructed(Vector2 tile)
         => Game1.currentLocation.objects.TryGetValue(tile, out var obj) && obj is not IndoorPot;

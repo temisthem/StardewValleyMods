@@ -1,12 +1,8 @@
-using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
+using TemLib;
 
 namespace EmptyJarBubbles;
 
-internal class Configuration {
-    public bool Enabled { get; set; } = true;
-    public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
-    public bool DefaultToggleOn { get; set; } = false;
+internal class Configuration : EmoteBubbleConfig {
     public bool ModdedMachinesEnabled { get; set; } = false;
     public bool JarsEnabled { get; set; } = true;
     public bool KegsEnabled { get; set; } = true;
@@ -30,10 +26,9 @@ internal class Configuration {
     public bool DeconstructorsEnabled { get; set; } = false;
     public bool GeodeCrushersEnabled { get; set; } = false;
     public bool WoodChippersEnabled { get; set; } = false;
-    public int OffsetY { get; set; } = 80;
-    public int OffsetX { get; set; } = 0;
-    public int EmoteInterval { get; set; } = 250;
-    public int OpacityPercent { get; set; } = 75;
-    public int SizePercent { get; set; } = 75;
     public bool ZoomLevel99Enabled { get; set; } = false;
+
+    public Configuration() {
+        OffsetY = 80;
+    }
 }

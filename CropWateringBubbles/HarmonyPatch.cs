@@ -1,3 +1,4 @@
+using TemLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -19,7 +20,7 @@ internal partial class Mod
             if (IsHarvestReady(hoeDirt.crop)) return;
 
             var emotePosition = GetEmotePosition(__instance.TileLocation, -72);
-            DrawBubble(spriteBatch, emotePosition, 1f);
+            BubbleDrawHelper.DrawEmoteBubble(spriteBatch, emotePosition, _config, _emoteManager.CurrentFrame, 1f);
         }
     }
 
@@ -33,22 +34,22 @@ internal partial class Mod
 
             var tilePosition = __instance.Tile;
             var emotePosition = GetEmotePosition(tilePosition, -48);
-            DrawBubble(spriteBatch, emotePosition, (tilePosition.Y * 64 + 37) / 10000f);
+            BubbleDrawHelper.DrawEmoteBubble(spriteBatch, emotePosition, _config, _emoteManager.CurrentFrame, (tilePosition.Y * 64 + 37) / 10000f);
         }
     }
-    
+
     private static bool ShouldDrawBubble()
     {
         if (!_config.Enabled) return false;
-        if (!_emoteEnabled) return false;
+        if (!_emoteManager.EmoteEnabled) return false;
         if (_config.OnlyWhenWatering && Game1.player.CurrentTool is not WateringCan) return false;
         return true;
     }
-    
+
     private static bool IsHoeDirtValid(HoeDirt hoeDirt)
     {
         if (IsWatered(hoeDirt)) return false;
-        
+
         var crop = hoeDirt.crop;
         if (crop is null) return false;
         if (IsFiberGrass(crop)) return false;
@@ -59,26 +60,10 @@ internal partial class Mod
     private static Vector2 GetEmotePosition(Vector2 tile, float yBase)
     {
         var emotePosition = Game1.GlobalToLocal(tile * 64);
-        var movePercent = (100 - _config.SizePercent) / 100f;
+        var movePercent = _config.MovePercent;
         emotePosition.Y += yBase + movePercent * 32;
         emotePosition += new Vector2(movePercent * 32 + _config.OffsetX, movePercent * 32 + _config.OffsetY);
         return emotePosition;
-    }
-
-    private static void DrawBubble(SpriteBatch spriteBatch, Vector2 emotePosition, float layerDepth)
-    {
-        spriteBatch.Draw(Game1.emoteSpriteSheet,
-            emotePosition,
-            new Rectangle(_currentEmoteFrame * 16 % Game1.emoteSpriteSheet.Width,
-                _currentEmoteFrame * 16 / Game1.emoteSpriteSheet.Width * 16,
-                16,
-                16),
-            Color.White * (_config.OpacityPercent / 100f),
-            0f,
-            Vector2.Zero,
-            4f * _config.SizePercent / 100f,
-            SpriteEffects.None,
-            layerDepth);
     }
 
     private static bool CanBecomeGiant(HoeDirt hoeDirt)
@@ -115,7 +100,7 @@ internal partial class Mod
         if (adjacent.crop.currentPhase.Value < adjacent.crop.phaseDays.Count - 1) return false;
         return !hoeDirt.crop.fullyGrown.Value || adjacent.crop.dayOfCurrentPhase.Value <= 0;
     }
-    
+
     private static bool IsHarvestReady(Crop crop) =>
         crop.currentPhase.Value >= crop.phaseDays.Count - 1
         && (!crop.fullyGrown.Value || crop.dayOfCurrentPhase.Value <= 0);

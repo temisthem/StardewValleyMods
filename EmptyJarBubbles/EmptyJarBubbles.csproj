@@ -13,4 +13,8 @@
         <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Common\TemLib.csproj" />
+    </ItemGroup>
+
 </Project>

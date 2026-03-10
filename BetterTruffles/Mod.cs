@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+using TemLib;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -20,18 +21,18 @@ internal partial class Mod: StardewModdingAPI.Mod {
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         ApplyHarmonyPatches();
     }
-    
+
     private void ApplyHarmonyPatches() {
         var harmony = new Harmony(ModManifest.UniqueID);
 
         harmony.Patch(
             original: AccessTools.Method(typeof(FarmAnimal), nameof(FarmAnimal.behaviors)),
-            prefix: new HarmonyMethod(typeof(FarmAnimal_behaviors_Patch), 
+            prefix: new HarmonyMethod(typeof(FarmAnimal_behaviors_Patch),
                 nameof(FarmAnimal_behaviors_Patch.Prefix))
         );
-        
+
         harmony.Patch(
-            original: AccessTools.Method(typeof(Object), nameof(Object.draw), new [] {
+            original: AccessTools.Method(typeof(Object), nameof(Object.draw), new[] {
                 typeof(SpriteBatch),
                 typeof(int),
                 typeof(int),
@@ -53,42 +54,42 @@ internal partial class Mod: StardewModdingAPI.Mod {
             reset: () => _config = new Configuration(),
             save: () => _modHelper.WriteConfig(_config)
         );
-        
+
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.Enabled,
             getValue: () => _config.Enabled,
             setValue: value => _config.Enabled = value
         );
-        
+
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.PigsDigInGrass,
             getValue: () => _config.PigsDigInGrass,
             setValue: value => _config.PigsDigInGrass = value
         );
-        
+
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.PigsDigInFlooring,
             getValue: () => _config.PigsDigInFlooring,
             setValue: value => _config.PigsDigInFlooring = value
         );
-        
+
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.ShowBubbles,
             getValue: () => _config.ShowBubbles,
             setValue: value => _config.ShowBubbles = value
         );
-        
+
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.RenderOnTop,
             getValue: () => _config.RenderOnTop,
             setValue: value => _config.RenderOnTop = value
         );
-        
+
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleYOffset,
@@ -97,7 +98,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
             min: -128,
             max: 128
         );
-        
+
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleXOffset,
@@ -115,7 +116,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
             min: 1,
             max: 100
         );
-        
+
         configMenu.AddNumberOption(
             mod: ModManifest,
             name: I18n.BubbleSize,

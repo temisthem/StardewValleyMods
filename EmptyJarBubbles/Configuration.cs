@@ -6,7 +6,7 @@ namespace EmptyJarBubbles;
 internal class Configuration {
     public bool Enabled { get; set; } = true;
     public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
-    public bool DisabledUntilToggledOn { get; set; } = false;
+    public bool DefaultToggleOn { get; set; } = false;
     public bool ModdedMachinesEnabled { get; set; } = false;
     public bool JarsEnabled { get; set; } = true;
     public bool KegsEnabled { get; set; } = true;

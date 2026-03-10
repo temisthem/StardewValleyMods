@@ -40,7 +40,7 @@ internal partial class Mod
     private static bool ShouldDrawBubble()
     {
         if (!_config.Enabled) return false;
-        if (!IsBubbleVisible()) return false;
+        if (!_emoteEnabled) return false;
         if (_config.OnlyWhenWatering && Game1.player.CurrentTool is not WateringCan) return false;
         return true;
     }

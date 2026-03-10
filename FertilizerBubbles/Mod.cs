@@ -52,7 +52,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
     }
     
     private static void SaveLoaded(object sender, SaveLoadedEventArgs e) {
-        _toggleEmoteEnabled = false;
+        _toggleEmoteEnabled = _config.DefaultToggleOn;
     }
     
     private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
@@ -117,6 +117,14 @@ internal partial class Mod: StardewModdingAPI.Mod {
             tooltip: I18n.ToggleEmoteKeyTooltip,
             getValue: () => _config.ToggleEmoteKey,
             setValue: value => _config.ToggleEmoteKey = value
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.DefaultToggleOn,
+            tooltip: I18n.DefaultToggleOnTooltip,
+            getValue: () => _config.DefaultToggleOn,
+            setValue: value => _config.DefaultToggleOn = value
         );
         
         configMenu.AddBoolOption(

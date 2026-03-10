@@ -9,6 +9,7 @@ internal class Configuration {
     public bool DisplayBubbleForSeeds { get; set; } = false;
     public bool DisplayWhenHeld { get; set; } = true;
     public KeybindList ToggleEmoteKey { get; set; } = new(new Keybind(SButton.None));
+    public bool DefaultToggleOn { get; set; } = false;
     public bool HideWhenUnusable { get; set; } = true;
     public bool HideWhenNoCrop { get; set; } = false;
 

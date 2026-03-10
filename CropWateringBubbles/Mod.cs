@@ -12,7 +12,7 @@ internal partial class Mod : StardewModdingAPI.Mod {
     private static Configuration _config;
     private static int _currentEmoteInterval;
     private static int _currentEmoteFrame;
-    private static bool _toggleEmoteEnabled;
+    private static bool _emoteEnabled;
 
     public override void Entry(IModHelper helper) {
         _config = helper.ReadConfig<Configuration>();
@@ -45,7 +45,7 @@ internal partial class Mod : StardewModdingAPI.Mod {
     }
 
     private static void SaveLoaded(object sender, SaveLoadedEventArgs e) {
-        _toggleEmoteEnabled = _config.DefaultToggleOn;
+        _emoteEnabled = !_config.ToggleEmoteKey.IsBound || _config.DefaultToggleOn;
     }
 
     private static void UpdateTicked(object sender, UpdateTickedEventArgs e) {
@@ -66,11 +66,9 @@ internal partial class Mod : StardewModdingAPI.Mod {
 
     private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
         if (!_config.Enabled) return;
-        if (_config.ToggleEmoteKey.JustPressed()) _toggleEmoteEnabled = !_toggleEmoteEnabled;
+        if (_config.ToggleEmoteKey.JustPressed()) _emoteEnabled = !_emoteEnabled;
     }
-
-    private static bool IsBubbleVisible() => !_config.ToggleEmoteKey.IsBound || _toggleEmoteEnabled;
-
+    
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e) {
         var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         if (configMenu is not null) RegisterConfig(configMenu);

@@ -62,7 +62,7 @@ internal class Mod: StardewModdingAPI.Mod {
 
     private void SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-        _emoteEnabled = !_config.DisabledUntilToggledOn;
+        _emoteEnabled = !_config.ToggleEmoteKey.IsBound || _config.DefaultToggleOn;
         Helper.Events.Display.RenderedWorld += RenderBubbles;
         _machineData = DataLoader.Machines(Game1.content);
         _moddedMachineQualifiedIds = GetModdedMachinesFromMachineData();
@@ -227,10 +227,10 @@ internal class Mod: StardewModdingAPI.Mod {
         
         configMenu.AddBoolOption(
             mod: ModManifest,
-            name: I18n.DisabledUntilToggledOn,
-            tooltip: I18n.DisabledUntilToggledOnTooltip,
-            getValue: () => _config.DisabledUntilToggledOn,
-            setValue: value => _config.DisabledUntilToggledOn = value
+            name: I18n.DefaultToggleOn,
+            tooltip: I18n.DefaultToggleOnTooltip,
+            getValue: () => _config.DefaultToggleOn,
+            setValue: value => _config.DefaultToggleOn = value
         );
 
         configMenu.AddNumberOption(

@@ -41,7 +41,7 @@ internal partial class Mod
     private static bool ShouldDrawBubble()
     {
         if (!_config.Enabled) return false;
-        if (!_emoteManager.EmoteEnabled) return false;
+        if (!_config.OnlyWhenWatering && _config.ToggleEmoteKey.IsBound && !_emoteManager.EmoteEnabled) return false;
         if (_config.OnlyWhenWatering && Game1.player.CurrentTool is not WateringCan) return false;
         return true;
     }

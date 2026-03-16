@@ -52,16 +52,15 @@ internal partial class Mod {
             return;
 
         var currentItem = Game1.player.CurrentItem;
-        if (IsItemSeed(currentItem))
-            return;
-
         if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem))
             return;
-        if (!_config.DisplayWhenHeld && !_emoteManager.EmoteEnabled)
+        if (!_config.DisplayWhenHeld &&
+            _config.ToggleEmoteKey.IsBound &&
+            !_emoteManager.EmoteEnabled)
             return;
 
         if (_config.HideWhenUnusable) {
-            if (currentItem is not null && !hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId))
+            if (currentItem is null || !hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId))
                 return;
             if (hoeDirt.crop?.indexOfHarvest.Value == "771") //Ignore fiber plants
                 return;
@@ -77,13 +76,15 @@ internal partial class Mod {
             return;
 
         var currentItem = Game1.player.CurrentItem;
-        if (!IsItemSeed(currentItem))
+        if (_config.DisplayWhenHeld && !IsItemSeed(currentItem))
             return;
         
-        if (!_config.DisplayWhenHeld && !_emoteManager.EmoteEnabled)
+        if (!_config.DisplayWhenHeld &&
+            _config.ToggleEmoteKey.IsBound &&
+            !_emoteManager.EmoteEnabled)
             return;
         
-        if (currentItem is not null && !hoeDirt.canPlantThisSeedHere(currentItem.ItemId))
+        if (currentItem is null || !hoeDirt.canPlantThisSeedHere(currentItem.ItemId))
             return;
 
         DrawBubble(hoeDirt, spriteBatch);
@@ -108,7 +109,7 @@ internal partial class Mod {
         return item.HasContextTag("fertilizer_item") || item.HasContextTag("quality_fertilizer_item");
     }
 
-    private static bool IsItemSeed(Item item) => item is not null && item.HasContextTag("seed_item");
+    private static bool IsItemSeed(Item item) => item is not null && item.HasContextTag("item_type_seeds");
 
     private static bool IsTileObstructed(Vector2 tile)
         => Game1.currentLocation.objects.TryGetValue(tile, out var obj) && obj is not IndoorPot;

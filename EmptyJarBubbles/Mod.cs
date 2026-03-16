@@ -40,7 +40,7 @@ internal class Mod: StardewModdingAPI.Mod {
 
     private static void UpdateTicked(object sender, UpdateTickedEventArgs e) {
         if (!_config.Enabled) return;
-        _emoteManager.Animate(_config, 16, 19);
+        _emoteManager.Animate(_config, 16, 19, 17);
     }
 
     private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
@@ -237,6 +237,13 @@ internal class Mod: StardewModdingAPI.Mod {
             setValue: value => _config.EmoteInterval = value,
             min: 0,
             max: 1000
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.NoAnimation,
+            getValue: () => _config.NoAnimation,
+            setValue: value => _config.NoAnimation = value
         );
 
         configMenu.AddNumberOption(

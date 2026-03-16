@@ -12,5 +12,6 @@
   "bubble-x-offset": "Bubble X Offset",
   "emote-interval": "Emote Interval (ms)",
   "opacity": "Opacity",
-  "bubble-size": "Bubble Size"
+  "bubble-size": "Bubble Size",
+  "no-animation": "No Animation"
 }

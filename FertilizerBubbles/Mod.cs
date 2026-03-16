@@ -63,12 +63,12 @@ internal partial class Mod: StardewModdingAPI.Mod {
         
         if (_config.DisplayBubbleForFertilizers)
         {
-            FertilizerEmoteManager.Animate(_config, 16, 19);
+            FertilizerEmoteManager.Animate(_config, 16, 19, 17);
         }
 
         if (_config.DisplayBubbleForSeeds)
         {
-            SeedEmoteManager.Animate(_config, 40, 43);
+            SeedEmoteManager.Animate(_config, 40, 43, 42);
         }
     }
 
@@ -155,6 +155,13 @@ internal partial class Mod: StardewModdingAPI.Mod {
             setValue: value => _config.EmoteInterval = value,
             min: 0,
             max: 1000
+        );
+        
+        configMenu.AddBoolOption(
+            mod: ModManifest,
+            name: I18n.NoAnimation,
+            getValue: () => _config.NoAnimation,
+            setValue: value => _config.NoAnimation = value
         );
 
         configMenu.AddNumberOption(

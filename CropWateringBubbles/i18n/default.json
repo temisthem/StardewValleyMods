@@ -9,6 +9,7 @@
   "bubble-y-offset": "Bubble Y Offset",
   "bubble-x-offset": "Bubble X Offset",
   "emote-interval": "Emote Interval (ms)",
+  "no-animation": "No Animation",
   "opacity": "Opacity",
   "bubble-size": "Bubble Size"
 }

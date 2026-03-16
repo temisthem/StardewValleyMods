@@ -16,13 +16,23 @@ public class EmoteManager {
         if (config.ToggleEmoteKey.JustPressed()) EmoteEnabled = !EmoteEnabled;
     }
 
-    public void Animate(EmoteBubbleConfig config, int startFrame, int endFrame) {
-        _currentInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+    public void Animate(EmoteBubbleConfig config, int startFrame, int endFrame, int stillFrame)
+    {
+        if (!config.Enabled) return;
+        
+        if (config.NoAnimation)
+        {
+            CurrentFrame = stillFrame;
+        }
+        else
+        {
+            _currentInterval += Game1.currentGameTime.ElapsedGameTime.Milliseconds;
 
-        if (CurrentFrame < startFrame || CurrentFrame > endFrame) CurrentFrame = startFrame;
-        if (_currentInterval > config.EmoteInterval) {
-            CurrentFrame = CurrentFrame < endFrame ? CurrentFrame + 1 : startFrame;
-            _currentInterval = 0;
+            if (CurrentFrame < startFrame || CurrentFrame > endFrame) CurrentFrame = startFrame;
+            if (_currentInterval > config.EmoteInterval) {
+                CurrentFrame = CurrentFrame < endFrame ? CurrentFrame + 1 : startFrame;
+                _currentInterval = 0;
+            }
         }
     }
 }

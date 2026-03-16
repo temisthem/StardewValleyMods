@@ -54,8 +54,8 @@ internal partial class Mod {
         if (_config.DisplayWhenHeld)
         {
             if (currentItem is null) return;
-            if (!hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId)) return;
             if (!IsItemFertilizer(currentItem)) return;
+            if (!hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId)) return;
         }
         else
         {

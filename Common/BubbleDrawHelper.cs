@@ -5,13 +5,6 @@ using StardewValley;
 namespace TemLib;
 
 public static class BubbleDrawHelper {
-    public static Rectangle GetEmoteSourceRect(int frame) {
-        return new Rectangle(
-            frame * 16 % Game1.emoteSpriteSheet.Width,
-            frame * 16 / Game1.emoteSpriteSheet.Width * 16,
-            16, 16);
-    }
-
     public static void DrawEmoteBubble(SpriteBatch spriteBatch, Vector2 position, BubbleConfig config, int frame, float layerDepth) {
         spriteBatch.Draw(
             Game1.emoteSpriteSheet,
@@ -23,5 +16,12 @@ public static class BubbleDrawHelper {
             config.Scale,
             SpriteEffects.None,
             layerDepth);
+    }
+    
+    private static Rectangle GetEmoteSourceRect(int frame) {
+        return new Rectangle(
+            frame * 16 % Game1.emoteSpriteSheet.Width,
+            frame * 16 / Game1.emoteSpriteSheet.Width * 16,
+            16, 16);
     }
 }

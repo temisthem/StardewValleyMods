@@ -3,7 +3,7 @@ using StardewValley;
 namespace TemLib;
 
 public class EmoteManager {
-    public bool EmoteEnabled { get; set; }
+    public bool EmoteEnabled { get; private set; }
     public int CurrentFrame { get; private set; }
     private int _currentInterval;
 

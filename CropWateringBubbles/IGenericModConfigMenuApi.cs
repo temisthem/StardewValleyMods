@@ -1,7 +1,7 @@
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
-namespace TemLib;
+namespace CropWateringBubbles;
 
 public interface IGenericModConfigMenuApi {
     void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);

@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
-using Object = StardewValley.Object;
 
 namespace FertilizerBubbles;
 
@@ -52,21 +51,19 @@ internal partial class Mod {
             return;
 
         var currentItem = Game1.player.CurrentItem;
-        if (_config.DisplayWhenHeld && !IsItemFertilizer(currentItem))
-            return;
-        if (!_config.DisplayWhenHeld &&
-            _config.ToggleEmoteKey.IsBound &&
-            !_emoteManager.EmoteEnabled)
-            return;
-
-        if (_config.HideWhenUnusable) {
-            if (currentItem is null || !hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId))
-                return;
-            if (hoeDirt.crop?.indexOfHarvest.Value == "771") //Ignore fiber plants
-                return;
+        if (_config.DisplayWhenHeld)
+        {
+            if (currentItem is null) return;
+            if (!hoeDirt.CanApplyFertilizer(currentItem.QualifiedItemId)) return;
+            if (!IsItemFertilizer(currentItem)) return;
+        }
+        else
+        {
+            if (!_config.ToggleEmoteKey.IsBound) return;
+            if (!FertilizerEmoteManager.EmoteEnabled) return;
         }
 
-        DrawBubble(hoeDirt, spriteBatch);
+        DrawBubble(hoeDirt, spriteBatch, FertilizerEmoteManager);
     }
 
     private static void DrawSeedBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
@@ -76,23 +73,24 @@ internal partial class Mod {
             return;
 
         var currentItem = Game1.player.CurrentItem;
-        if (_config.DisplayWhenHeld && !IsItemSeed(currentItem))
-            return;
-        
-        if (!_config.DisplayWhenHeld &&
-            _config.ToggleEmoteKey.IsBound &&
-            !_emoteManager.EmoteEnabled)
-            return;
-        
-        if (currentItem is null || !hoeDirt.canPlantThisSeedHere(currentItem.ItemId))
-            return;
+        if (_config.DisplayWhenHeld)
+        {
+            if (currentItem is null) return;
+            if (!IsItemSeed(currentItem)) return;
+            if (!hoeDirt.canPlantThisSeedHere(currentItem.ItemId)) return;
+        }
+        else
+        {
+            if (!_config.ToggleEmoteKey.IsBound) return;
+            if (!SeedEmoteManager.EmoteEnabled) return;
+        }
 
-        DrawBubble(hoeDirt, spriteBatch);
+        DrawBubble(hoeDirt, spriteBatch, SeedEmoteManager);
     }
 
-    private static void DrawBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch) {
+    private static void DrawBubble(HoeDirt hoeDirt, SpriteBatch spriteBatch, EmoteManager emoteManager) {
         var emotePosition = GetEmotePosition(hoeDirt);
-        BubbleDrawHelper.DrawEmoteBubble(spriteBatch, emotePosition, _config, _emoteManager.CurrentFrame, 1f);
+        BubbleDrawHelper.DrawEmoteBubble(spriteBatch, emotePosition, _config, emoteManager.CurrentFrame, 1f);
     }
 
     private static Vector2 GetEmotePosition(HoeDirt hoeDirt) {

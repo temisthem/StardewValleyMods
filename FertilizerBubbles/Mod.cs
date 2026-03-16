@@ -3,7 +3,6 @@ using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 
@@ -11,7 +10,8 @@ namespace FertilizerBubbles;
 
 internal partial class Mod: StardewModdingAPI.Mod {
     private static Configuration _config;
-    private static readonly EmoteManager _emoteManager = new();
+    private static readonly EmoteManager FertilizerEmoteManager = new();
+    private static readonly EmoteManager SeedEmoteManager = new();
 
     public override void Entry(IModHelper helper) {
         _config = helper.ReadConfig<Configuration>();
@@ -49,16 +49,27 @@ internal partial class Mod: StardewModdingAPI.Mod {
     }
 
     private static void SaveLoaded(object sender, SaveLoadedEventArgs e) {
-        _emoteManager.InitOnSaveLoaded(_config);
+        FertilizerEmoteManager.InitOnSaveLoaded(_config);
+        SeedEmoteManager.InitOnSaveLoaded(_config);
     }
 
     private static void InputButtonsChanged(object sender, ButtonsChangedEventArgs e) {
-        _emoteManager.HandleToggleInput(_config);
+        FertilizerEmoteManager.HandleToggleInput(_config);
+        SeedEmoteManager.HandleToggleInput(_config);
     }
 
     private static void UpdateTicked(object sender, UpdateTickedEventArgs e) {
         if (!_config.Enabled) return;
-        _emoteManager.Animate(_config, 16, 19);
+        
+        if (_config.DisplayBubbleForFertilizers)
+        {
+            FertilizerEmoteManager.Animate(_config, 16, 19);
+        }
+
+        if (_config.DisplayBubbleForSeeds)
+        {
+            SeedEmoteManager.Animate(_config, 40, 43);
+        }
     }
 
     private void RegisterConfig(IGenericModConfigMenuApi configMenu) {

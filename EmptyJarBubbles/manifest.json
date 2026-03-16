@@ -1,7 +1,7 @@
 {
   "Name": "Empty Jar Bubbles",
   "Author": "temisthem",
-  "Version": "1.0.4-beta",
+  "Version": "1.0.5-beta",
   "Description": "Never leave accidentally leave a jar empty again!",
   "UniqueID": "tem696969696969.EmptyJarBubbles",
   "EntryDll": "EmptyJarBubbles.dll",

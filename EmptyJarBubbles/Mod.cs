@@ -152,7 +152,7 @@ internal class Mod: StardewModdingAPI.Mod {
 
     private static void RenderBubbles(object sender, RenderedWorldEventArgs e) {
         if (!_config.Enabled) return;
-        if (!_emoteManager.EmoteEnabled) return;
+        if (_config.ToggleEmoteKey.IsBound && !_emoteManager.EmoteEnabled) return;
 
         foreach (var machine in _machines.Where(IsMachineRenderReady))
             DrawBubbles(machine, e.SpriteBatch);

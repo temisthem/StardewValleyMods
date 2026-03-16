@@ -116,7 +116,7 @@ internal class Mod: StardewModdingAPI.Mod {
     private static bool IsValidMachine(Object o) {
         return IsObjectValidMachine(o, _config.JarsEnabled, VanillaMachineQualifiedIds.Jar) ||
                IsObjectValidMachine(o, _config.KegsEnabled, VanillaMachineQualifiedIds.Keg) ||
-               (IsObjectValidMachine(o, _config.CasksEnabled, VanillaMachineQualifiedIds.Cask) && CaskInValidLocation(o)) ||
+               (IsObjectValidMachine(o, _config.CasksEnabled, VanillaMachineQualifiedIds.Cask) && OnlyShowCaskBubblesWhenInCellar()) ||
                IsObjectValidMachine(o, _config.MayonnaiseMachinesEnabled, VanillaMachineQualifiedIds.MayonnaiseMachine) ||
                IsObjectValidMachine(o, _config.CheesePressesEnabled, VanillaMachineQualifiedIds.CheesePress) ||
                IsObjectValidMachine(o, _config.LoomsEnabled, VanillaMachineQualifiedIds.Loom) ||
@@ -139,10 +139,10 @@ internal class Mod: StardewModdingAPI.Mod {
                (_config.ModdedMachinesEnabled && _moddedMachineQualifiedIds.Contains(o.QualifiedItemId));
     }
 
-    private static bool CaskInValidLocation(Object o)
+    private static bool OnlyShowCaskBubblesWhenInCellar()
     {
         if (_config.CasksOutsideOfCellarEnabled) return true;
-        return o.Location is Cellar;
+        return Game1.player.currentLocation is Cellar;
     }
 
     private static bool IsObjectValidMachine(Object o, bool enabled, string qualifiedId) {

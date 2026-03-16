@@ -7,7 +7,6 @@
   "toggle-emote-key-tooltip": "Only works when 'Display when fertilizer/seed is held' is disabled",
   "default-toggle-on": "Default Toggle On",
   "default-toggle-on-tooltip": "When a toggle key is set, bubbles are visible by default",
-  "hide-when-unusable": "Hide when fertilizer is unusable",
   "hide-when-no-crop": "Hide when soil has no crops",
   "bubble-y-offset": "Bubble Y Offset",
   "bubble-x-offset": "Bubble X Offset",

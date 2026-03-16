@@ -13,7 +13,7 @@ internal partial class Mod {
             if (!_config.Enabled) return;
 
             if (_config.DisplayBubbleForFertilizers) {
-                if (!_config.HideWhenUnusable || __instance.bush.Value is null)
+                if (_config.HideWhenNoCrop && __instance.bush.Value is null)
                 {
                     DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch);
                 }

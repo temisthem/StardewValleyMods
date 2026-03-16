@@ -122,14 +122,7 @@ internal partial class Mod: StardewModdingAPI.Mod {
             getValue: () => _config.DefaultToggleOn,
             setValue: value => _config.DefaultToggleOn = value
         );
-
-        configMenu.AddBoolOption(
-            mod: ModManifest,
-            name: I18n.HideWhenUnusable,
-            getValue: () => _config.HideWhenUnusable,
-            setValue: value => _config.HideWhenUnusable = value
-        );
-
+        
         configMenu.AddBoolOption(
             mod: ModManifest,
             name: I18n.HideWhenNoCrop,

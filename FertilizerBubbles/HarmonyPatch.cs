@@ -14,15 +14,17 @@ internal partial class Mod {
             if (!_config.Enabled) return;
 
             if (_config.DisplayBubbleForFertilizers) {
-                if (_config.HideWhenUnusable && __instance.bush.Value is not null)
-                    return;
-                DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch);
+                if (!_config.HideWhenUnusable || __instance.bush.Value is null)
+                {
+                    DrawFertilizerBubble(__instance.hoeDirt.Get(), spriteBatch);
+                }
             }
 
             if (_config.DisplayBubbleForSeeds) {
-                if (__instance.bush.Value is not null)
-                    return;
-                DrawSeedBubble(__instance.hoeDirt.Get(), spriteBatch);
+                if (__instance.bush.Value is null)
+                {
+                    DrawSeedBubble(__instance.hoeDirt.Get(), spriteBatch);
+                }
             }
         }
     }
@@ -77,6 +79,10 @@ internal partial class Mod {
         var currentItem = Game1.player.CurrentItem;
         if (!IsItemSeed(currentItem))
             return;
+        
+        if (!_config.DisplayWhenHeld && !_emoteManager.EmoteEnabled)
+            return;
+        
         if (currentItem is not null && !hoeDirt.canPlantThisSeedHere(currentItem.ItemId))
             return;
 

@@ -56,10 +56,10 @@ internal partial class Mod
 
     private static bool IsHoeDirtValid(HoeDirt hoeDirt)
     {
-        if (IsWatered(hoeDirt)) return false;
+        if (hoeDirt.isWatered()) return false;
+        if (!hoeDirt.needsWatering()) return false;
 
         var crop = hoeDirt.crop;
-        if (crop is null) return false;
         if (IsFiberGrass(crop)) return false;
         if (crop.dead.Value) return false;
         return true;
@@ -113,6 +113,5 @@ internal partial class Mod
         crop.currentPhase.Value >= crop.phaseDays.Count - 1
         && (!crop.fullyGrown.Value || crop.dayOfCurrentPhase.Value <= 0);
 
-    private static bool IsWatered(HoeDirt hoeDirt) => hoeDirt.state.Value != 0;
     private static bool IsFiberGrass(Crop crop) => crop.indexOfHarvest.Value == "771";
 }

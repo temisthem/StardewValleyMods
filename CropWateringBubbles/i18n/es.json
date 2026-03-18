@@ -1,0 +1,15 @@
+{
+  "enabled": "Activado",
+  "only-when-watering": "Solo al Regar",
+  "include-giantable": "Mostrar en Gigante",
+  "toggle-emote-key": "Tecla para Alternar Emote",
+  "toggle-emote-key-tooltip": "Presiona esta tecla para ocultar/mostrar burbujas",
+  "default-toggle-on": "Alternar Activado por Defecto",
+  "default-toggle-on-tooltip": "Cuando se asigna una tecla de alternancia, las burbujas son visibles por defecto",
+  "bubble-y-offset": "Desplazamiento Y de la Burbuja",
+  "bubble-x-offset": "Desplazamiento X de la Burbuja",
+  "emote-interval": "Intervalo de Emote (ms)",
+  "no-animation": "Sin Animación",
+  "opacity": "Opacidad",
+  "bubble-size": "Tamaño de la Burbuja"
+}

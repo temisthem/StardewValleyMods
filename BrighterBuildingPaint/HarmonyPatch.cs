@@ -32,9 +32,9 @@ internal partial class Mod {
 
     public class BuildingPaintMenu_Draw_Patch {
         private const int MarginX = 568;
-        private const int MarginY = 208;
-        private const int GapY = 40;
         private const int BtnOffsetX = 260;
+        private const int BtnOffsetY = 80;
+        private const int RowVerticalGap = 16;
         private const int BtnSize = 36;
         private const int BtnGap = 4;
         private const int HoverGrow = 1;
@@ -45,7 +45,6 @@ internal partial class Mod {
             AdjustButtons.Clear();
 
             var baseX = __instance.buildingPaintMenu.xPositionOnScreen + IClickableMenu.borderWidth + MarginX;
-            var baseY = __instance.buildingPaintMenu.yPositionOnScreen + IClickableMenu.borderWidth + MarginY;
             var btnBaseX = baseX + BtnOffsetX;
 
             var sliders = new[] {
@@ -55,8 +54,8 @@ internal partial class Mod {
             };
 
             for (var i = 0; i < sliders.Length; i++) {
-                var y = baseY + GapY * i;
                 var (slider, label) = sliders[i];
+                var y = slider.handle.bounds.Y + BtnOffsetY + i*RowVerticalGap;
 
                 Utility.drawTextWithShadow(b, label + ": " + slider.GetValue(), Game1.dialogueFont, new Vector2(baseX, y), Game1.textColor, 0.8f);
 

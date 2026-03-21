@@ -55,10 +55,11 @@ internal partial class Mod
 
     private static bool IsHoeDirtValid(HoeDirt hoeDirt)
     {
-        if (IsWatered(hoeDirt)) return false;
-
+        if (hoeDirt.isWatered()) return false;
+        
         var crop = hoeDirt.crop;
         if (crop is null) return false;
+        if (!crop.GetData().NeedsWatering) return false;
         if (IsFiberGrass(crop)) return false;
         if (crop.dead.Value) return false;
         return true;

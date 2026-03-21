@@ -54,8 +54,7 @@ internal partial class Mod {
         }
         else
         {
-            if (!_config.ToggleEmoteKey.IsBound) return;
-            if (!FertilizerEmoteManager.EmoteEnabled) return;
+            if (_config.ToggleEmoteKey.IsBound && !FertilizerEmoteManager.EmoteEnabled) return;
         }
 
         DrawBubble(hoeDirt, spriteBatch, FertilizerEmoteManager);
@@ -76,8 +75,7 @@ internal partial class Mod {
         }
         else
         {
-            if (!_config.ToggleEmoteKey.IsBound) return;
-            if (!SeedEmoteManager.EmoteEnabled) return;
+            if (_config.ToggleEmoteKey.IsBound && !SeedEmoteManager.EmoteEnabled) return;
         }
 
         DrawBubble(hoeDirt, spriteBatch, SeedEmoteManager);

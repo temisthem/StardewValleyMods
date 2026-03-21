@@ -47,8 +47,7 @@ internal partial class Mod
         }
         else
         {
-            if (!_config.ToggleEmoteKey.IsBound) return false;
-            if (!_emoteManager.EmoteEnabled) return false;
+            if (_config.ToggleEmoteKey.IsBound && !_emoteManager.EmoteEnabled) return false;
         }
 
         return true;
